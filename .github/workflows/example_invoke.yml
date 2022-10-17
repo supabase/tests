@@ -3,10 +3,14 @@ name: Example workflow that triggers tests run in this repo
 on:
   workflow_dispatch:
     inputs:
-      event_type_name:
-        description: 'repository_dispatch event name ('run-integration-local', 'run-verification-prod', 'run-verification-stage')'
+      name:
+        type: choice
+        description: repository_dispatch event_type
         required: true
-        default: 'run-integration-local'
+        options:
+          - run-integration-local
+          - run-verification-prod
+          - run-verification-stage
 
 jobs:
   run-tests:
@@ -28,5 +32,5 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           repo: tests
           owner: supabase
-          event_type: ${{ github.event.inputs.event_type_name }} # 'run-integration-local', 'run-verification-prod', 'run-verification-stage'
+          event_type: ${{ github.event.inputs.name }} # 'run-integration-local', 'run-verification-prod', 'run-verification-stage'
           # result will be posted to #test-alerts channel if tests fail
