@@ -1,0 +1,27 @@
+{
+  "name": "tests",
+  "version": "0.1.0",
+  "description": "Tests for supabase",
+  "scripts": {
+    "project:migrate": "NODE_ENV=migrate MIGRATIONS_FILE=./integration/supabase/migrations/data.sql ts-node-esm ./src/scripts/apply-migrations.ts",
+    "project:create": "ts-node-esm ./src/scripts/create-project.ts",
+    "project:delete": "ts-node-esm ./src/scripts/delete-project.ts"
+  },
+  "author": "Supabase, Inc.",
+  "license": "MIT",
+  "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
+    "@supabase/supabase-js": "^1.34.1",
+    "@types/node": "^17.0.38",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "cross-fetch": "^3.1.5",
+    "dotenv": "^16.0.0",
+    "eslint": "^8.7.0",
+    "otpauth": "^7.1.2",
+    "playwright": "^1.21.1",
+    "postgres": "^3.3.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}
