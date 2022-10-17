@@ -40,7 +40,6 @@ class Project extends Hooks {
     const ref = pageURLParts.pop()
     expect(isBuilding).toBe('building')
 
-    await page.close()
     for (let i = 0; i < 60; i++) {
       try {
         const statusResp = await crossFetch(`${Project.SupaPlatformURI}/projects/${ref}/status`, {
@@ -54,6 +53,7 @@ class Project extends Hooks {
         await page.waitForTimeout(3000)
       }
     }
+    await page.close()
 
     const statusResp = await crossFetch(
       `${Project.SupaPlatformURI}/projects/${ref}/status`,

@@ -158,8 +158,14 @@ jobs:
           PUBLISH_BRANCH: gh-pages
           PUBLISH_DIR: allure-history
 
+  alert:
+    name: Alert slack if tests failed
+    if: ${{ failure() }}
+    needs: [verification, integration, report]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
       - name: Notify slack
-        if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -167,5 +173,5 @@ jobs:
           SLACK_ICON_EMOJI: ':supa-eve:'
           SLACK_TITLE: 'Staging verification tests'
           SLACK_FOOTER: 'Supabase'
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_MESSAGE: 'Verification tests for Staging have finished with ${{ job.status }}. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
+          SLACK_COLOR: failure
+          SLACK_MESSAGE: 'Verification tests for Staging have finished with failure. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
