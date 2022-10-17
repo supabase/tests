@@ -205,7 +205,7 @@ class AuthenticationAPI extends Hooks {
     expect(error).toBeNull()
     expect(resultUser).not.toBeNull()
     expect(resultUser.id).toBe(user.id)
-    expect(resultUser.email).toBe(updatedUser.email.toLowerCase())
+    expect(resultUser.email.toLowerCase()).toBe(updatedUser.email.toLowerCase())
     expect(resultUser.phone).toBe(updatedUser.phone)
   }
 

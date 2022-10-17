@@ -88,7 +88,7 @@ jobs:
           PUBLISH_DIR: allure-history
 
       - name: Notify slack
-        if: always()
+        if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -97,4 +97,4 @@ jobs:
           SLACK_TITLE: 'Local integration tests'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: ${{ job.status }}
-          SLACK_MESSAGE: 'Integration tests have been run. <https://supabase.github.io/test-reports/integration-local/${{ github.run_number }}|See the report>'
+          SLACK_MESSAGE: 'Integration tests have been run: ${{ job.status }}. <https://supabase.github.io/test-reports/integration-local/${{ github.run_number }}|See the report>'

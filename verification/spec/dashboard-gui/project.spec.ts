@@ -8,7 +8,7 @@ import { FEATURE } from '../../src/enums/feature'
 import { STATUS } from '../../src/enums/status'
 import { Hooks } from './hooks'
 
-@suite.skip('[gui] project')
+@suite('[gui] project')
 class Project extends Hooks {
   @feature(FEATURE.SETTINGS)
   @severity(Severity.NORMAL)

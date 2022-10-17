@@ -159,7 +159,7 @@ jobs:
           PUBLISH_DIR: allure-history
 
       - name: Notify slack
-        if: always()
+        if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -168,4 +168,4 @@ jobs:
           SLACK_TITLE: 'Staging verification tests'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: ${{ job.status }}
-          SLACK_MESSAGE: 'Verification tests for staging have been completed. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
+          SLACK_MESSAGE: 'Verification tests for staging have been ${{ job.status }}. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
