@@ -1,0 +1,32 @@
+name: Example workflow that triggers tests run in this repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      event:
+        description: 'repository_dispatch event name ('run-integration-local', 'run-verification-prod', 'run-verification-stage')'
+        required: true
+        default: 'run-integration-local'
+
+jobs:
+  run-tests:
+    name: Run tests from another repo
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Wait until your code is published or deployed
+        run: echo "Waiting for deployment to finish..."
+
+      - name: Emit repository_dispatch to tests repo
+        uses: mvasigh/dispatch-action@main
+        with:
+          # You should provide either:
+          # * Personal access tokens with repo scope. For more information, see
+          #     "https://docs.github.com/articles/creating-a-personal-access-token-for-the-command-line".
+          # * GitHub Apps with both metadata:read and contents:read&write permissions.
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repo: tests
+          owner: supabase
+          event_type: ${{ github.event.inputs.event }} # 'run-integration-local', 'run-verification-prod', 'run-verification-stage'
+          # result will be posted to #test-alerts channel if tests fail
