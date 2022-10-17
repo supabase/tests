@@ -73,7 +73,7 @@ jobs:
         if: always()
         with:
           github_repo: test-reports
-          allure_results: tests/allure-results
+          allure_results: integration/allure-results
           allure_history: allure-history
           subfolder: integration-local
           keep_reports: 50

@@ -27,6 +27,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        working-directory: .
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run verification tests
         run: npm run test:stage
@@ -46,7 +50,7 @@ jobs:
         if: ${{ always() }}
         with:
           name: allure-results-verification-stage
-          path: tests/allure-results
+          path: verification/allure-results
           retention-days: 1
 
   integration:
@@ -72,6 +76,7 @@ jobs:
           GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
           GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
           SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
+          SUPA_DASHBOARD: 'https://app.supabase.green'
           SUPA_ORG_ID: '166'
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
@@ -103,4 +108,5 @@ jobs:
           GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
           GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
           SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
+          SUPA_DASHBOARD: 'https://app.supabase.green'
           PROJECT_JSON: 'project.json'
