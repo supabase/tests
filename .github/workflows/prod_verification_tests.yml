@@ -85,22 +85,7 @@ jobs:
         run: |
           npm run project:create
           cp .env.migrate integration/.env.prod
-          cd integration
-          mkdir temp
-          cp -r supabase temp/supabase
-          cp ../project.json temp/project.json
-
-      - uses: supabase/setup-cli@v1
-
-      - run: SUPABASE_DB_PASSWORD=$(cat project.json | jq -r ".db_pass") supabase link --project-ref $(cat project.json | jq -r ".ref")
-        working-directory: integration/temp
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.PROD_SUPA_ACCESS_TOKEN }}
-
-      - run: SUPABASE_DB_PASSWORD=$(cat project.json | jq -r ".db_pass")  supabase db push
-        working-directory: integration/temp
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.PROD_SUPA_ACCESS_TOKEN }}
+          npm run project:migrate
 
       - name: Install dependencies
         run: npm ci
@@ -113,7 +98,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
-          name: allure-results-integration-stage
+          name: allure-results-integration-prod
           path: integration/allure-results
           retention-days: 1
 
@@ -183,4 +168,4 @@ jobs:
           SLACK_TITLE: 'Prod verification tests'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: ${{ job.status }}
-          SLACK_MESSAGE: 'Verification tests for Prod have been ${{ job.status }}. <https://supabase.github.io/test-reports/verification-prod/${{ github.run_number }}|See the report>'
+          SLACK_MESSAGE: 'Verification tests for Prod have finished with ${{ job.status }}. <https://supabase.github.io/test-reports/verification-prod/${{ github.run_number }}|See the report>'

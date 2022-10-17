@@ -168,4 +168,4 @@ jobs:
           SLACK_TITLE: 'Staging verification tests'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: ${{ job.status }}
-          SLACK_MESSAGE: 'Verification tests for staging have been ${{ job.status }}. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
+          SLACK_MESSAGE: 'Verification tests for Staging have finished with ${{ job.status }}. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
