@@ -1,0 +1,180 @@
+name: Run verification tests against production env
+
+on:
+  schedule:
+    - cron: '0 4/12 * * *'
+  # Webhook to trigger the workflow from other repositories
+  repository_dispatch:
+    types: [run-verification-prod]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  verification:
+    name: Verification Tests
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: verification
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run verification tests
+        run: npm run test:prod
+        env:
+          GITHUB_TOTP: ${{ secrets.VERIFICATION_PROD_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.VERIFICATION_PROD_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.VERIFICATION_PROD_GITHUB_PASS }}
+          PROJECT_REF: 'nhspkocxnkjvbphkoepx'
+          PROJECT_NAME: 'verifytests'
+          PROJECT_DB_PASS: ${{ secrets.VERIFICATION_PROD_PROJECT_DB_PASS }}
+          SUPA_PLATFORM_URI: 'https://api.supabase.io/platform'
+          SUPA_META_URI: 'https://api.supabase.io/platform/pg-meta'
+          SUPA_PROJECT_DOMAIN: 'supabase.co'
+          SUPA_DASHBOARD: 'https://app.supabase.io'
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: allure-results-verification-prod
+          path: tests/allure-results
+          retention-days: 1
+
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create project
+        env:
+          GITHUB_TOTP: ${{ secrets.INTEGRATION_STAGE_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.INTEGRATION_STAGE_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.INTEGRATION_STAGE_GITHUB_PASS }}
+          SUPA_PLATFORM_URI: 'https://api.supabase.io/platform'
+          SUPA_ORG_ID: '105764'
+          OUTPUT_FILE: '.env.migrate'
+          PROJECT_JSON: 'project.json'
+        run: |
+          npm run project:create
+          cp .env.migrate integration/.env.prod
+          cd integration
+          mkdir temp
+          cp -r supabase temp/supabase
+          cp ../project.json temp/project.json
+
+      - uses: supabase/setup-cli@v1
+
+      - run: SUPABASE_DB_PASSWORD=$(cat project.json | jq -r ".db_pass") supabase link --project-ref $(cat project.json | jq -r ".ref")
+        working-directory: integration/temp
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      - run: SUPABASE_DB_PASSWORD=$(cat project.json | jq -r ".db_pass")  supabase db push
+        working-directory: integration/temp
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: integration
+
+      - name: Run integration tests
+        run: npm run test:prod
+        working-directory: integration
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: allure-results-integration-stage
+          path: integration/allure-results
+          retention-days: 1
+
+      - name: Remove project
+        run: npm run project:delete
+        if: ${{ always() }}
+        env:
+          GITHUB_TOTP: ${{ secrets.INTEGRATION_STAGE_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.INTEGRATION_STAGE_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.INTEGRATION_STAGE_GITHUB_PASS }}
+          SUPA_PLATFORM_URI: 'https://api.supabase.io/platform'
+          PROJECT_JSON: 'project.json'
+
+  report:
+    name: Upload report
+    if: ${{ always() }}
+    needs: [verification, integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v3
+
+      - name: CP all results to the one folder
+        shell: bash
+        run: |
+          mkdir ./allure-results
+          cp ./allure-results-integration-prod/* ./allure-results/
+          cp ./allure-results-verification-prod/* ./allure-results/
+
+      - name: Get Allure history
+        uses: actions/checkout@v2
+        if: always()
+        continue-on-error: true
+        with:
+          repository: supabase/test-reports
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Allure Report action
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          github_repo: test-reports
+          allure_results: allure-results
+          allure_history: allure-history
+          subfolder: verification-prod
+          keep_reports: 50
+
+      - name: Deploy report to Github Pages
+        if: ${{ !github.event.pull_request.head.repo.fork }}
+        uses: peaceiris/actions-gh-pages@v2
+        env:
+          EXTERNAL_REPOSITORY: supabase/test-reports
+          ACTIONS_DEPLOY_KEY: ${{ secrets.DEPLOY_TO_TEST_REPORTS_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
+
+      - name: Notify slack
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_USERNAME: TestBot
+          SLACK_ICON_EMOJI: ':sad_dog:'
+          SLACK_TITLE: 'Prod verification tests'
+          SLACK_FOOTER: 'Supabase'
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_MESSAGE: 'Verification tests for Prod have been completed. <https://supabase.github.io/test-reports/verification-prod/${{ github.run_number }}|See the report>'

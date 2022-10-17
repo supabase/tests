@@ -1,0 +1,100 @@
+name: Local Integration Tests
+
+on:
+  pull_request:
+    paths:
+      - 'integration/**'
+      - '.github/workflows/integration-tests.yml'
+  schedule:
+    - cron: '0 4/6 * * *'
+  # Webhook to trigger the workflow from other repositories
+  repository_dispatch:
+    types: [run-integration-local]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  autotests:
+    name: Run tests and generate Allure Report
+    strategy:
+      matrix:
+        node: ['14']
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./integration
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: supabase/setup-cli@v1
+      - run: supabase start
+
+      - name: Run Test
+        run: npm run test:local
+        env:
+          SUPABASE_DB_PORT: 54322
+          SUPABASE_DB_PASS: postgres
+          SUPABASE_DB_HOST: localhost
+          SUPABASE_GOTRUE: http://localhost:54321
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_KEY_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs
+          SUPABASE_KEY_ADMIN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSJ9.vI9obAHOGyVVKa3pD--kJlyxp-Z2zV9UUMAhKpNLAcU
+
+      - name: Stop infrastructure
+        if: always()
+        run: supabase stop
+
+      - name: Get Allure history
+        uses: actions/checkout@v2
+        if: always()
+        continue-on-error: true
+        with:
+          repository: supabase/test-reports
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Allure Report action
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          github_repo: test-reports
+          allure_results: tests/allure-results
+          allure_history: allure-history
+          subfolder: integration-local
+          keep_reports: 50
+
+      - name: Deploy report to Github Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v2
+        env:
+          EXTERNAL_REPOSITORY: supabase/test-reports
+          ACTIONS_DEPLOY_KEY: ${{ secrets.DEPLOY_TO_TEST_REPORTS_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
+
+      - name: Notify slack
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_USERNAME: TestBot
+          SLACK_ICON_EMOJI: ':sad_dog:'
+          SLACK_TITLE: 'Local integration tests'
+          SLACK_FOOTER: 'Supabase'
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_MESSAGE: 'Integration tests have been run. <https://supabase.github.io/test-reports/integration-local/${{ github.run_number }}|See the report>'

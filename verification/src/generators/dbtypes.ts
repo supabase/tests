@@ -1,0 +1,18 @@
+export default [
+  'int2',
+  'int4',
+  'int8',
+  'float4',
+  'float8',
+  'varchar',
+  'text',
+  'uuid',
+  'bool',
+  'json',
+  'jsonb',
+  'date',
+  'timestamp',
+  'timestamptz',
+  'time',
+  'timetz',
+]

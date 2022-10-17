@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "newLine": "LF",
+    "noErrorTruncation": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "inlineSources": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["ESNext"],
+    "module": "CommonJS",
+    "types": ["node"],
+    "removeComments": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "declaration": true,
+    "composite": false,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*", "./types/*"],
+      "src/*": ["src/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types/",
+      "./node_modules/allure2-js-commons/dist/declarations/**/"
+    ]
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*"],
+  "compileOnSave": false
+}
