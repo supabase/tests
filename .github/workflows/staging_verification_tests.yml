@@ -158,7 +158,7 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_USERNAME: TestBot
-          SLACK_ICON_EMOJI: ':sad_dog:'
+          SLACK_ICON_EMOJI: ':supa-eve:'
           SLACK_TITLE: 'Staging verification tests'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: ${{ job.status }}
