@@ -171,7 +171,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_USERNAME: TestBot
           SLACK_ICON_EMOJI: ':supa-eve:'
-          SLACK_TITLE: 'Prod verification tests'
+          SLACK_TITLE: 'Prod Verification tests Failed'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: failure
-          SLACK_MESSAGE: 'Verification tests for Prod have finished with failure. <https://supabase.github.io/test-reports/verification-prod/${{ github.run_number }}|See the report>'
+          SLACK_MESSAGE: 'Hey @group-infra : Verification tests for Prod have finished with failure. <https://supabase.github.io/test-reports/verification-prod/${{ github.run_number }}|See the report>'
