@@ -120,6 +120,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v2
+
       - name: Download all test results
         uses: actions/download-artifact@v3
 
