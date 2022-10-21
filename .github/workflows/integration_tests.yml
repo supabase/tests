@@ -95,7 +95,8 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_USERNAME: TestBot
           SLACK_ICON_EMOJI: ':supa-eve:'
-          SLACK_TITLE: 'Local integration tests'
+          SLACK_LINK_NAMES: true
+          SLACK_TITLE: 'Local Integration tests Failed'
           SLACK_FOOTER: 'Supabase'
           SLACK_COLOR: ${{ job.status }}
           SLACK_MESSAGE: 'Integration tests have finished with ${{ job.status }}. <https://supabase.github.io/test-reports/integration-local/${{ github.run_number }}|See the report>'
