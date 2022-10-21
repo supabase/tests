@@ -80,12 +80,13 @@ jobs:
 
       - name: Deploy report to Github Pages
         if: always()
-        uses: peaceiris/actions-gh-pages@v2
-        env:
-          EXTERNAL_REPOSITORY: supabase/test-reports
-          ACTIONS_DEPLOY_KEY: ${{ secrets.DEPLOY_TO_TEST_REPORTS_KEY }}
-          PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: allure-history
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          repository-name: supabase/test-reports
+          ssh-key: ${{ secrets.DEPLOY_TO_TEST_REPORTS_KEY }}
+          branch: gh-pages
+          folder: allure-history
+          force: false
 
       - name: Notify slack
         if: ${{ failure() }}

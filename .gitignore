@@ -11,6 +11,8 @@ allure-report
 .nyc_output
 *.log
 
+browserContext-*
+
 # turbo
 .turbo
 
