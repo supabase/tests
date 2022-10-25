@@ -38,13 +38,16 @@ class SQL extends Hooks {
   @test
   async 'create content'() {
     const fakeQuery = this.genQuery()
+
+    log('send create content request')
     const contentResp = await crossFetch(
       `${SQL.supaPlatformURI}/projects/${process.env.PROJECT_REF}/content`,
       {
         method: 'POST',
         headers: SQL.headers,
         body: JSON.stringify(fakeQuery),
-      }
+      },
+      10 * 1000
     )
 
     expect(contentResp.status).toBe(201)
@@ -53,6 +56,7 @@ class SQL extends Hooks {
     expect(content.type).toBe(fakeQuery.type)
     expect(content.visibility).toBe(fakeQuery.visibility)
 
+    log('update content with query')
     const query = 'select count(*) from extensions.pg_stat_statements'
     const contentUpdateResp = await crossFetch(
       `${SQL.supaPlatformURI}/projects/${process.env.PROJECT_REF}/content?id=${content.id}`,
@@ -69,7 +73,8 @@ class SQL extends Hooks {
             sql: query,
           },
         }),
-      }
+      },
+      10 * 1000
     )
     expect(contentUpdateResp.status).toBe(200)
     const updContents = await contentUpdateResp.json()
@@ -78,17 +83,20 @@ class SQL extends Hooks {
     const ourContent = updContents.filter((c: any) => c.id === content.id)[0]
     expect(ourContent.content.sql).toBe(query)
 
+    log('get content to check if it was updated')
     const contentGetResp = await crossFetch(
       `${SQL.supaPlatformURI}/projects/${process.env.PROJECT_REF}/content`,
       {
         headers: SQL.headers,
-      }
+      },
+      10 * 1000
     )
     expect(contentGetResp.status).toBe(200)
     const { data: contents } = await contentGetResp.json()
     expect(contents.length).toBeGreaterThan(0)
     expect(contents.map((c: any) => c.id)).toContain(content.id)
 
+    log('validate query')
     const validateResp = await crossFetch(
       `${SQL.supaMetaURI}/${process.env.PROJECT_REF}/query/validate`,
       {
@@ -97,31 +105,39 @@ class SQL extends Hooks {
         body: JSON.stringify({
           query: ourContent.content.sql,
         }),
-      }
+      },
+      10 * 1000
     )
     expect(validateResp.status).toBe(201)
     const validate = await validateResp.json()
     expect(validate.valid).toBe(true)
 
-    const executeResp = await crossFetch(`${SQL.supaMetaURI}/${process.env.PROJECT_REF}/query`, {
-      method: 'POST',
-      headers: SQL.headers,
-      body: JSON.stringify({
-        query: ourContent.content.sql,
-      }),
-    })
+    log('execute query')
+    const executeResp = await crossFetch(
+      `${SQL.supaMetaURI}/${process.env.PROJECT_REF}/query`,
+      {
+        method: 'POST',
+        headers: SQL.headers,
+        body: JSON.stringify({
+          query: ourContent.content.sql,
+        }),
+      },
+      10 * 1000
+    )
     expect(executeResp.status).toBe(201)
     const execute = await executeResp.json()
     expect(execute.length).toBeGreaterThan(0)
     expect(execute[0].count).toBeGreaterThan(0)
 
+    log('remove query')
     const deleteResp = await crossFetch(
       `${SQL.supaPlatformURI}/projects/${process.env.PROJECT_REF}/content?id=${content.id}`,
       {
         method: 'DELETE',
         headers: SQL.headers,
         body: JSON.stringify({}),
-      }
+      },
+      10 * 1000
     )
     expect(deleteResp.status).toBe(200)
   }

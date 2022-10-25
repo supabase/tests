@@ -67,6 +67,7 @@ class Storage extends Hooks {
       public: params.public,
     })
     expect(error).not.toBeNull()
+    expect(bucket).toBeNull()
     expect(error.message).toContain('row-level security')
     expect(error.message).toContain('"buckets"')
   }
@@ -82,6 +83,7 @@ class Storage extends Hooks {
     const bucket2 = await this.createBucket()
 
     const { data: buckets, error } = await supabase.storage.listBuckets()
+    expect(error).toBeNull()
     expect(buckets.length).toBeGreaterThanOrEqual(2)
     expect(buckets.map((b) => b.name)).toEqual(expect.arrayContaining([bucket1.name, bucket2.name]))
   }
@@ -108,14 +110,11 @@ class Storage extends Hooks {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket(params.public)
 
-    const {
-      data: { message },
-      error,
-    } = await supabase.storage.updateBucket(bucket.id, {
+    const { data, error } = await supabase.storage.updateBucket(bucket.id, {
       public: !params.public,
     })
     expect(error).toBeNull()
-    expect(message).toBe('Successfully updated')
+    expect(data.message).toBe('Successfully updated')
 
     bucket.public = !params.public
     const { data: gotBucket } = await supabase.storage.getBucket(bucket.id)
@@ -130,12 +129,9 @@ class Storage extends Hooks {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
-    const {
-      data: { message },
-      error,
-    } = await supabase.storage.deleteBucket(bucket.id)
+    const { data, error } = await supabase.storage.deleteBucket(bucket.id)
     expect(error).toBeNull()
-    expect(message).toBe('Successfully deleted')
+    expect(data.message).toBe('Successfully deleted')
 
     const { data: buckets } = await supabase.storage.listBuckets()
     expect(
@@ -159,12 +155,9 @@ class Storage extends Hooks {
       path: faker.random.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
-    const {
-      data: { path },
-      error,
-    } = await supabase.storage.from(bucket.name).upload(file.path, file.data)
+    const { data, error } = await supabase.storage.from(bucket.name).upload(file.path, file.data)
     expect(error).toBeNull()
-    expect(path).toEqual(file.path)
+    expect(data.path).toEqual(file.path)
   }
 
   @feature(FEATURE.STORAGE)
@@ -359,16 +352,15 @@ class Storage extends Hooks {
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
 
-    const {
-      data: { signedUrl },
-      error,
-    } = await supabase.storage.from(bucket.name).createSignedUrl(file.path, 10000)
+    const { data, error } = await supabase.storage
+      .from(bucket.name)
+      .createSignedUrl(file.path, 10000)
     expect(error).toBeNull()
-    expect(signedUrl).toBeDefined()
-    expect(signedUrl.length).toBeGreaterThan(1)
-    expect(signedUrl).toMatch(new RegExp(`^http[s]?://.*storage.*/${bucket.name}/.*`))
+    expect(data.signedUrl).toBeDefined()
+    expect(data.signedUrl.length).toBeGreaterThan(1)
+    expect(data.signedUrl).toMatch(new RegExp(`^http[s]?://.*storage.*/${bucket.name}/.*`))
 
-    const resp = await fetch(signedUrl)
+    const resp = await fetch(data.signedUrl)
     expect(resp.status).toEqual(200)
     expect(await resp.text()).toEqual(file.data)
   }
