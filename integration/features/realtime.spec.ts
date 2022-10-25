@@ -2,7 +2,7 @@ import { params, suite, test, timeout } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 
-import { RealtimeChannel } from '@supabase/supabase-js'
+import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 
 import { FEATURE } from '../types/enums'
 import { description, feature, log, severity, step } from '../.jest/jest-custom-reporter'
@@ -11,12 +11,23 @@ import { Hooks } from './hooks'
 @suite('realtime')
 @timeout(30000)
 class Realtime extends Hooks {
+  static sbClients: SupabaseClient<any, 'public', any>[] = []
+
+  static async after(done: any) {
+    log('removing channels')
+    Realtime.sbClients.map(async (s) => await s.removeAllChannels())
+    Realtime.sbClients = []
+    log('hooks after')
+    await Hooks.after(done)
+  }
+
   @feature(FEATURE.REALTIME)
   @severity(Severity.BLOCKER)
   @description('When you call "on" table then connected realtime client should be returned')
   @test
-  async '[skip-stage] connect to realtime'() {
+  async 'connect to realtime'() {
     const { supabase } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     const channel = supabase
       .channel('profiles')
@@ -38,10 +49,11 @@ class Realtime extends Hooks {
   @description('When you subscrive to realtime, you have to receive updates')
   @timeout(60000)
   @test
-  async '[skip-stage] receive event when connected to realtime'() {
+  async '[skip-local] receive event when connected to realtime'() {
     let res: any
     let t: NodeJS.Timeout
     const { supabase, user } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     let payloadReceived = (payload: any) => {
       if (payload?.eventType !== 'INSERT') {
@@ -86,6 +98,7 @@ class Realtime extends Hooks {
   @test
   async 'you should get no events until subscribe'() {
     const { supabase, user } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     const channel = supabase
       .channel('profiles')
@@ -112,6 +125,7 @@ class Realtime extends Hooks {
   @test
   async 'get supabase client subscriptions'() {
     const { supabase } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     const channel1 = supabase
       .channel('profiles')
@@ -222,8 +236,9 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you unsubscribe from table then no events have to be returned')
   @test
-  async '[skip-stage] unsubscribe from table'() {
+  async 'unsubscribe from table'() {
     const { supabase, user } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     const channel = supabase
       .channel('profiles')
@@ -249,8 +264,9 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you remove one subscription then only events from another have to be returned')
   @test
-  async '[skip-stage] remove one subscription from client'() {
+  async 'remove one subscription from client'() {
     const { supabase, user } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     const channel = supabase
       .channel('profiles')
@@ -275,8 +291,9 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you remove all subscription then no events have to be returned')
   @test
-  async '[skip-stage] remove all subscriptions from client'() {
+  async 'remove all subscriptions from client'() {
     const { supabase, user } = await this.createSignedInSupaClient()
+    Realtime.sbClients.push(supabase)
 
     const channel = supabase
       .channel('profiles')

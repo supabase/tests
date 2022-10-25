@@ -6,7 +6,7 @@
     "docker:up": "supabase start",
     "docker:down": "supabase stop",
     "test": "jest",
-    "test:local": "NODE_ENV=local jest --testNamePattern '^((?!\\[skip-local\\]).)*$' --testPathPattern '^((?!realtime).)*$' --detectOpenHandles",
+    "test:local": "NODE_ENV=local jest --testNamePattern '^((?!\\[skip-local\\]).)*$' --detectOpenHandles",
     "test:stage": "NODE_ENV=staging jest --testNamePattern '^((?!\\[skip-stage\\]).)*$' --testPathPattern '^((?!realtime).)*$' --detectOpenHandles",
     "test:prod": "NODE_ENV=prod jest --detectOpenHandles",
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
