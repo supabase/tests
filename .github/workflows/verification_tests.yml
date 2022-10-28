@@ -84,6 +84,7 @@ jobs:
           npm run project:create
           cp .env.migrate integration/.env.staging
           npm run project:migrate
+          echo $(cat project.json | jq -r ".ref")
 
       - name: Install dependencies
         run: npm ci
