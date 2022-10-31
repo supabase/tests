@@ -73,6 +73,7 @@ const getAccessToken = async () => {
     // Wait for redirect back to app.supabase.io(.green)
     try {
       await page.waitForNavigation({ url: /app.supabase./ })
+      await page.waitForLoadState('networkidle')
     } catch {
       // a bit hard to make this reliable: we can sometimes not hit this wait condition and
       // navigation will happen before we this call, and then we will receive an error;
