@@ -82,6 +82,7 @@ jobs:
           SUPA_ORG_ID: '166'
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
+          EXTRA_WAIT_SECONDS: 30
         run: |
           npm run project:create
           cp .env.migrate integration/.env.staging

@@ -49,8 +49,8 @@ const getAccessToken = async () => {
     // In case verification has not started automatically on code submission
     try {
       if (
-        (await page.locator('button[type="submit"]').isVisible()) &&
-        (await page.locator('button[type="submit"]').isEnabled())
+        (await page.locator('button[type="submit"]').first().isVisible()) &&
+        (await page.locator('button[type="submit"]').first().isEnabled())
       ) {
         await page.click('button[type="submit"]')
       }
@@ -79,7 +79,8 @@ const getAccessToken = async () => {
       // but if we omit this completely, we will get an error on the next call cause
       // we will be at the moment before redirect actually happens during the next call
     }
-    await page.locator('button:has-text("New project")').first().isVisible()
+    await page.waitForLoadState('networkidle')
+    await page.locator('button:has-text("New project")').first().isVisible({ timeout: 20000 })
 
     // get access token
     token = await page.evaluate<Session>(async () => {
