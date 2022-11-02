@@ -30,6 +30,6 @@ const supabase = createClient(url, anonKey, options)
     const { error, data } = await supabase.auth.signUp(fakeUser)
     assert(error === null, error?.message)
     assert(data.user !== null, 'data is null')
-    console.log(`${i} | ${data.user.id} | ${data.user.email} `)
+    console.log(`${i} | ${data.user.id} | ${data.user.email} | ${fakeUser.password}`)
   }
 })()
