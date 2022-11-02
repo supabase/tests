@@ -101,13 +101,61 @@ jobs:
           path: integration/allure-results
           retention-days: 1
 
-      - name: Remove project
-        run: npm run project:delete
-        if: ${{ always() }}
-        env:
-          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
-          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
-          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
-          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
-          SUPA_DASHBOARD: 'https://app.supabase.green'
-          PROJECT_JSON: 'project.json'
+      # - name: Remove project
+      #   run: npm run project:delete
+      #   if: ${{ always() }}
+      #   env:
+      #     GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
+      #     GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
+      #     GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
+      #     SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
+      #     SUPA_DASHBOARD: 'https://app.supabase.green'
+      #     PROJECT_JSON: 'project.json'
+
+  report:
+    name: Upload report
+    if: ${{ always() }}
+    needs: [verification, integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download all test results
+        uses: actions/download-artifact@v3
+
+      - name: CP all results to the one folder
+        shell: bash
+        run: |
+          mkdir ./allure-results
+          cp ./allure-results-integration-stage/* ./allure-results/
+          cp ./allure-results-verification-stage/* ./allure-results/
+
+      - name: Get Allure history
+        uses: actions/checkout@v2
+        if: always()
+        continue-on-error: true
+        with:
+          repository: supabase/test-reports
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Allure Report action
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          github_repo: test-reports
+          allure_results: allure-results
+          allure_history: allure-history
+          subfolder: verification-tests
+          keep_reports: 50
+
+      - name: Deploy report to Github Pages
+        if: always()
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          repository-name: supabase/test-reports
+          ssh-key: ${{ secrets.DEPLOY_TO_TEST_REPORTS_KEY }}
+          branch: gh-pages
+          folder: allure-history
+          force: false

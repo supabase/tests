@@ -410,7 +410,8 @@ class Storage extends Hooks {
     expect(bucket.name).toBe(bucketName)
     Storage.buckets.push(bucket)
 
-    const { data: buckets } = await supabase.storage.listBuckets()
+    const { data: buckets, error: errList } = await supabase.storage.listBuckets()
+    expect(errList).toBeNull()
     return buckets.find((b) => b.name === bucketName)
   }
 }

@@ -16,6 +16,8 @@ const orgID = parseInt(supaOrgID)
 const supaRegion = process.env.SUPA_REGION || 'Southeast Asia (Singapore)'
 const outputFile = process.env.OUTPUT_FILE || '.env'
 const projectFile = process.env.PROJECT_JSON || 'project.json'
+const extraWaitSeconds = process.env.EXTRA_WAIT_SECONDS || '0'
+const waitTime = parseInt(extraWaitSeconds) * 1000
 
 ;(async () => {
   // login to supabase
@@ -119,4 +121,7 @@ SUPABASE_KEY_ANON=${project.anon_key}
 SUPABASE_KEY_ADMIN=${project.service_key}
 `
   )
+
+  // wait for project to be ready some additional time
+  await new Promise((resolve) => setTimeout(resolve, waitTime))
 })()
