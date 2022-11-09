@@ -5,6 +5,7 @@ on:
     paths:
       - 'verification/**'
       - 'integration/**'
+      - 'src/**'
       - '.github/workflows/*'
 
 jobs:
