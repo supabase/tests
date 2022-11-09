@@ -2,6 +2,7 @@ import assert from 'assert'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import { faker } from '@faker-js/faker'
+import { createClient } from '@supabase/supabase-js'
 
 import crossFetch from '../common/timeoutFetch'
 import { getAccessToken } from '../auth/getUserToken'
@@ -74,6 +75,21 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   const { status } = await statusResp.json()
   assert(status == 'ACTIVE_HEALTHY')
 
+  // save project body to file
+  project.db_pass = dbPass
+  fs.writeFileSync(projectFile, JSON.stringify(project, null, 2))
+  fs.writeFileSync(
+    outputFile,
+    `SUPABASE_DB_HOST=${project.endpoint.replace('https://', 'db.')}
+SUPABASE_DB_PORT=5432
+SUPABASE_DB_PASS=${dbPass}
+SUPABASE_GOTRUE=${project.endpoint}/auth/v1
+SUPABASE_URL=${project.endpoint}
+SUPABASE_KEY_ANON=${project.anon_key}
+SUPABASE_KEY_ADMIN=${project.service_key}
+`
+  )
+
   // update project auth settings to skip email verification as it may cause unnecessary flakiness
   const patchResp = await crossFetch(
     `${supaPlatformUri}/auth/${ref}/config`,
@@ -105,18 +121,15 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     console.log('could not patch auth config')
   }
 
-  // save project body to file
-  project.db_pass = dbPass
-  fs.writeFileSync(projectFile, JSON.stringify(project, null, 2))
-  fs.writeFileSync(
-    outputFile,
-    `SUPABASE_DB_HOST=${project.endpoint.replace('https://', 'db.')}
-SUPABASE_DB_PORT=5432
-SUPABASE_DB_PASS=${dbPass}
-SUPABASE_GOTRUE=${project.endpoint}/auth/v1
-SUPABASE_URL=${project.endpoint}
-SUPABASE_KEY_ANON=${project.anon_key}
-SUPABASE_KEY_ADMIN=${project.service_key}
-`
-  )
+  // wait for storage to be ready for project
+  for (let i = 0; i < 20; i++) {
+    try {
+      const supabase = createClient(project.endpoint, project.service_key)
+      const { error: errList } = await supabase.storage.listBuckets()
+      assert(errList == null)
+      break
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+    }
+  }
 })()
