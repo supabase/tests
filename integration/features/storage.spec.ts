@@ -457,9 +457,20 @@ class Storage extends Hooks {
     const bucketName = this.word()
 
     log('creating bucket', bucketName)
-    const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
+    let { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
       public: pub,
     })
+    if (error) {
+      log(error.name, error.message)
+      const { data: bucketTemp, error: errorTemp } = await supabase.storage.createBucket(
+        bucketName,
+        {
+          public: pub,
+        }
+      )
+      bucket = bucketTemp
+      error = errorTemp
+    }
     expect(error).toBeNull()
     expect(bucket).toBeDefined()
     expect(bucket.name).toBe(bucketName)
