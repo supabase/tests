@@ -37,8 +37,11 @@ const getAccessToken = async () => {
     // Go to app.supabase.io
     const page = await context.newPage()
     await page.goto(supaDashboard)
-    await page.locator('button:has-text("Sign In with GitHub")').first().click()
-
+    try {
+      await page.locator('button:has-text("Sign In with GitHub")').first().click()
+    } catch {
+      await page.locator('button:has-text("Continue with GitHub")').first().click()
+    }
     // REdirected to GitHub: interact with login form
     await page.fill('input[name="login"]', githubUser)
     await page.fill('input[name="password"]', githubPass)

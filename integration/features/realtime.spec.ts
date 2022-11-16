@@ -1,11 +1,11 @@
 import { params, suite, test, timeout } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
-import { Severity } from 'allure-js-commons'
+import { ContentType, Severity } from 'allure-js-commons'
 
 import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 
 import { FEATURE } from '../types/enums'
-import { description, feature, log, severity, step } from '../.jest/jest-custom-reporter'
+import { attach, description, feature, log, severity, step } from '../.jest/jest-custom-reporter'
 import { Hooks } from './hooks'
 
 @suite('realtime')
@@ -29,6 +29,7 @@ class Realtime extends Hooks {
     const { supabase } = await this.createSignedInSupaClient()
     Realtime.sbClients.push(supabase)
 
+    log('connecting to realtime')
     const channel = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) =>
@@ -40,6 +41,7 @@ class Realtime extends Hooks {
     const err = await this.waitForChannelJoined(channel)
     await new Promise((resolve) => setTimeout(resolve, 1000))
     expect(err).toBeNull()
+    log('removing channel')
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')
   }
@@ -56,6 +58,7 @@ class Realtime extends Hooks {
     Realtime.sbClients.push(supabase)
 
     let payloadReceived = (payload: any) => {
+      attach('payload received', payload, ContentType.JSON)
       if (payload?.eventType !== 'INSERT') {
         return
       }
@@ -69,6 +72,7 @@ class Realtime extends Hooks {
       res(null)
     }
 
+    log('connecting to realtime')
     const channel = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, payloadReceived)
@@ -86,8 +90,10 @@ class Realtime extends Hooks {
       })
     })
     await this.insertProfile(supabase, user, user)
+    log('waiting for event')
     expect(await eventPromise).toBeNull()
 
+    log('removing channel')
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')
   }
@@ -100,6 +106,7 @@ class Realtime extends Hooks {
     const { supabase, user } = await this.createSignedInSupaClient()
     Realtime.sbClients.push(supabase)
 
+    log('connecting to realtime')
     const channel = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
@@ -111,8 +118,10 @@ class Realtime extends Hooks {
     await this.insertProfile(supabase, user, user)
 
     // wait for 1 second to see if we receive any events
+    log('waiting for event (should not receive any)')
     await new Promise((resolve) => setTimeout(resolve, 1000))
     expect(channel._isClosed).toBeTruthy()
+    log('removing channel')
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')
   }
@@ -127,6 +136,7 @@ class Realtime extends Hooks {
     const { supabase } = await this.createSignedInSupaClient()
     Realtime.sbClients.push(supabase)
 
+    log('creating two realtime channels')
     const channel1 = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
@@ -140,8 +150,10 @@ class Realtime extends Hooks {
         expect('event received').toBe('should not receive event')
       })
 
+    log('listing channels')
     const channels = supabase.getChannels()
     expect(channels).toEqual(expect.arrayContaining([channel1, channel2]))
+    log('removing channels')
     supabase.removeAllChannels()
     expect(supabase.getChannels().length).toEqual(0)
   }
@@ -240,6 +252,7 @@ class Realtime extends Hooks {
     const { supabase, user } = await this.createSignedInSupaClient()
     Realtime.sbClients.push(supabase)
 
+    log('subscribe to realtime')
     const channel = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
@@ -248,15 +261,19 @@ class Realtime extends Hooks {
       })
     channel.subscribe()
     // wait for subscription to postgres
+    log('waiting for subscription to postgres')
     await new Promise((resolve) => setTimeout(resolve, 8000))
+    log('unsubscribe from realtime')
     const ok = await channel.unsubscribe()
     expect(ok).toEqual('ok')
 
     await this.insertProfile(supabase, user, user)
 
     // wait for 1 second to see if we receive any events
+    log('waiting for 1 second to see if we receive any events')
     await new Promise((resolve) => setTimeout(resolve, 1000))
     expect(channel._isClosed).toBeTruthy()
+    log('removing channels')
     await supabase.removeChannel(channel)
   }
 
@@ -268,6 +285,7 @@ class Realtime extends Hooks {
     const { supabase, user } = await this.createSignedInSupaClient()
     Realtime.sbClients.push(supabase)
 
+    log('subscribe to realtime')
     const channel = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
@@ -276,13 +294,16 @@ class Realtime extends Hooks {
       })
     channel.subscribe()
     // wait for subscription to postgres
+    log('waiting for subscription to postgres')
     await new Promise((resolve) => setTimeout(resolve, 8000))
+    log('unsubscribe from realtime')
     const ok = await supabase.removeChannel(channel)
     expect(ok).toEqual('ok')
 
     await this.insertProfile(supabase, user, user)
 
     // wait for 1 second to see if we receive any events
+    log('waiting for 1 second to see if we receive any events')
     await new Promise((resolve) => setTimeout(resolve, 1000))
     expect(channel._isClosed).toBeTruthy()
   }
@@ -295,6 +316,7 @@ class Realtime extends Hooks {
     const { supabase, user } = await this.createSignedInSupaClient()
     Realtime.sbClients.push(supabase)
 
+    log('subscribe to realtime')
     const channel = supabase
       .channel('profiles')
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
@@ -303,13 +325,16 @@ class Realtime extends Hooks {
       })
     channel.subscribe()
     // wait for subscription to postgres
+    log('waiting for subscription to postgres')
     await new Promise((resolve) => setTimeout(resolve, 8000))
+    log('unsubscribe from realtime for all channels')
     const ok = await supabase.removeAllChannels()
     expect(ok).toEqual(expect.arrayContaining(['ok']))
 
     await this.insertProfile(supabase, user, user)
 
     // wait for 1 second to see if we receive any events
+    log('waiting for 1 second to see if we receive any events')
     await new Promise((resolve) => setTimeout(resolve, 1000))
     expect(channel._isClosed).toBeTruthy()
   }

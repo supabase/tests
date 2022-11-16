@@ -38,7 +38,7 @@ class Storage extends Hooks {
   @params({ public: false })
   async 'create bucket'(params: { public: boolean }) {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
-    const bucketName = faker.unique(faker.random.word)
+    const bucketName = this.word()
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
       public: params.public,
     })
@@ -61,7 +61,7 @@ class Storage extends Hooks {
   @params({ public: false })
   async 'user cannot create bucket because of RLS'(params: { public: boolean }) {
     const { supabase } = await this.createSignedInSupaClient()
-    const bucketName = faker.unique(faker.random.word)
+    const bucketName = this.word()
 
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
       public: params.public,
@@ -152,7 +152,7 @@ class Storage extends Hooks {
     const bucket = await this.createBucket()
 
     const file = {
-      path: faker.random.word() + '.txt',
+      path: this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     const { data, error } = await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -173,15 +173,15 @@ class Storage extends Hooks {
     for (let i = 0; i < 3; i++) {
       requests.push(
         new Promise((resolve) => {
-          const dir = faker.random.word()
+          const dir = this.word()
           const file = {
-            path: dir + '/' + faker.random.word() + '.txt',
+            path: dir + '/' + this.word() + '.txt',
             data: faker.lorem.sentence(),
           }
           files.push(file)
           const p1 = supabase.storage.from(bucket.name).upload(file.path, file.data)
           const file2 = {
-            path: dir + '/' + faker.random.word() + '.txt',
+            path: dir + '/' + this.word() + '.txt',
             data: faker.lorem.sentence(),
           }
           files.push(file2)
@@ -217,7 +217,7 @@ class Storage extends Hooks {
     const bucket = await this.createBucket()
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -236,8 +236,8 @@ class Storage extends Hooks {
     const bucket = await this.createBucket()
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '.txt',
-      newPath: faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '.txt',
+      newPath: this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -261,8 +261,8 @@ class Storage extends Hooks {
     const bucket = await this.createBucket()
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '.txt',
-      newPath: faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '.txt',
+      newPath: this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -293,7 +293,7 @@ class Storage extends Hooks {
     const bucket = await this.createBucket()
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -319,7 +319,7 @@ class Storage extends Hooks {
     const bucket = await this.createBucket(false)
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -347,7 +347,7 @@ class Storage extends Hooks {
     const bucket = await this.createBucket(params.public)
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -374,7 +374,7 @@ class Storage extends Hooks {
     const bucket = await this.createBucket()
 
     const file = {
-      path: faker.random.word() + '/' + faker.random.word() + '/' + faker.random.word() + '.txt',
+      path: this.word() + '/' + this.word() + '/' + this.word() + '.txt',
       data: faker.lorem.paragraph(),
     }
     await supabase.storage.from(bucket.name).upload(file.path, file.data)
@@ -400,7 +400,7 @@ class Storage extends Hooks {
   @step('create bucket')
   async createBucket(pub = true) {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
-    const bucketName = faker.unique(faker.random.word)
+    const bucketName = this.word()
 
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
       public: pub,
@@ -412,5 +412,9 @@ class Storage extends Hooks {
 
     const { data: buckets } = await supabase.storage.listBuckets()
     return buckets.find((b) => b.name === bucketName)
+  }
+
+  private word() {
+    return faker.unique(faker.random.word).replace(/[^a-zA-Z0-9]/g, '')
   }
 }

@@ -51,6 +51,7 @@ class PostgREST extends Hooks {
 
     const newName = faker.internet.userName()
     // update profile for user
+    log('update profile for user')
     const { data: updUser, error } = await supabase
       .from('profiles')
       .update({
@@ -77,6 +78,7 @@ class PostgREST extends Hooks {
     await this.insertProfile(supabase, user, user)
 
     // delete profile for user
+    log('delete profile for user')
     const { error } = await supabase.from('profiles').delete().eq('id', user.id).select()
     expect(error).toBeNull()
 

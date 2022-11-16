@@ -1,4 +1,4 @@
-import { suite, test, timeout } from '@testdeck/jest'
+import { suite, test, timeout, retries } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 
@@ -13,6 +13,7 @@ class Authentication extends Hooks {
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.BLOCKER)
   @description('When user sign up then corresponding user in auth schema should be created')
+  @retries(2)
   @test
   async 'signup should create user'() {
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
@@ -26,7 +27,6 @@ class Authentication extends Hooks {
       data: { user, session },
       error: signUpError,
     } = await this.signUp(supabase, fakeUser)
-
     expect(signUpError).toBeNull()
     expect(user).toBeDefined()
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
@@ -59,6 +59,7 @@ class Authentication extends Hooks {
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
     expect(emptySession).not.toBeNull()
 
+    log('sign in user with email and password')
     const {
       data: { session },
       error: signInError,
@@ -68,6 +69,7 @@ class Authentication extends Hooks {
     })
     expect(signInError).toBeNull()
     expect(session).toBeDefined()
+    log('user signed in, set session')
     await supabase.auth.setSession(session)
 
     // check if user is signed in
@@ -135,6 +137,7 @@ class Authentication extends Hooks {
 
     // sign in as user
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('sign in user with email and password')
     const {
       data: { session, user },
       error: signInError,
@@ -142,7 +145,6 @@ class Authentication extends Hooks {
       email: fakeUser.email,
       password: fakeUser.password,
     })
-
     expect(signInError).toBeNull()
     expect(session).toBeDefined()
     expect(user).toBeDefined()
@@ -179,6 +181,7 @@ class Authentication extends Hooks {
 
     // sign in as user
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('sign in user with email and password')
     await supabase.auth.signInWithPassword({
       email: fakeUser.email,
       password: fakeUser.password,
@@ -189,7 +192,6 @@ class Authentication extends Hooks {
       data: { user },
       error: getUserErr,
     } = await this.getUser(supabase)
-
     log('Check if user is signed in correctly and can get his data')
     expect(getUserErr).toBeNull()
     expect(user).not.toBeNull()
@@ -260,6 +262,7 @@ class Authentication extends Hooks {
 
     // sign in as user
     const sb = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('sign in user with email and password')
     const {
       data: { session },
     } = await sb.auth.signInWithPassword({
@@ -268,6 +271,7 @@ class Authentication extends Hooks {
     })
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('set session')
     const { error: sessionErr } = await supabase.auth.setSession(session)
     expect(sessionErr).toBeNull()
 
@@ -290,6 +294,7 @@ class Authentication extends Hooks {
     // create user
     const fakeUser = await this.createUser()
     const events: { event: AuthChangeEvent; token: string }[] = []
+    log('set up listener for auth state changes')
     const onAuthStateChanged = (event: AuthChangeEvent, session: Session) => {
       log('onAuthStateChanged triggered', event)
       events.push({ event, token: session?.access_token })
@@ -297,11 +302,13 @@ class Authentication extends Hooks {
 
     // create client and subscribe on auth state changes
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('subscribe on auth state changes')
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(onAuthStateChanged)
 
     // sign in as user
+    log('sign in user with email and password')
     await supabase.auth.signInWithPassword({
       email: fakeUser.email,
       password: fakeUser.password,
@@ -317,10 +324,13 @@ class Authentication extends Hooks {
     expect(updUserError).toBeNull()
 
     // remove subscription and sign out
+    log('remove subscription')
     subscription.unsubscribe()
+    log('sign out')
     await supabase.auth.signOut()
 
     // check if sign in and update events were triggered and sign out event was not triggered
+    log('check if sign in and update events were triggered and sign out event was not triggered')
     expect(events).toHaveLength(2)
     expect(events.map((e) => e.event)).toEqual(
       expect.arrayContaining(['SIGNED_IN', 'USER_UPDATED'])
