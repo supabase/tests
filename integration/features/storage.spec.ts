@@ -116,15 +116,29 @@ class Storage extends Hooks {
     const bucket = await this.createBucket(params.public)
 
     log(`update bucket ${bucket.id}, set public=${!params.public}`)
-    const { data, error } = await supabase.storage.updateBucket(bucket.id, {
+    let { data, error } = await supabase.storage.updateBucket(bucket.id, {
       public: !params.public,
     })
+    if (error) {
+      log(error.name, error.message)
+      const { data: dataTemp, error: errorTemp } = await supabase.storage.updateBucket(bucket.id, {
+        public: !params.public,
+      })
+      data = dataTemp
+      error = errorTemp
+    }
     expect(error).toBeNull()
     expect(data.message).toBe('Successfully updated')
 
     bucket.public = !params.public
     log('get bucket after update')
-    const { data: gotBucket, error: getError } = await supabase.storage.getBucket(bucket.id)
+    let { data: gotBucket, error: getError } = await supabase.storage.getBucket(bucket.id)
+    if (getError) {
+      log(getError.name, getError.message)
+      const { data: dataTemp, error: errorTemp } = await supabase.storage.getBucket(bucket.id)
+      gotBucket = dataTemp
+      getError = errorTemp
+    }
     expect(getError).toBeNull()
     expect(gotBucket).toEqual(bucket)
   }
