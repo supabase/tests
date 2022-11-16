@@ -1,4 +1,4 @@
-import { suite, test } from '@testdeck/jest'
+import { suite, test, retries } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import crossFetch from '../../../src/common/timeoutFetch'
 import { ContentType, Severity } from 'allure-js-commons'
@@ -36,6 +36,7 @@ class SQL extends Hooks {
   @severity(Severity.NORMAL)
   @description('create new sql query in editor')
   @test
+  @retries(2)
   async 'create content'() {
     const fakeQuery = this.genQuery()
 

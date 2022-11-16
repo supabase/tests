@@ -1,4 +1,4 @@
-import { params, retries, suite, test } from '@testdeck/jest'
+import { params, suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 
@@ -31,6 +31,7 @@ class AuthenticationAPI extends Hooks {
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
 
+    log('sign in with email and password')
     const {
       data: { user: createdUser },
       error: getErr,
@@ -55,6 +56,7 @@ class AuthenticationAPI extends Hooks {
     }
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
 
+    log('create user')
     const {
       error,
       data: { user },
@@ -81,6 +83,7 @@ class AuthenticationAPI extends Hooks {
       email: faker.internet.exampleEmail(),
       password: faker.internet.password(),
     }
+    log('create user')
     const {
       error,
       data: { user: newUser },
@@ -98,11 +101,12 @@ class AuthenticationAPI extends Hooks {
     const { user: user2 } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+
+    log('list users')
     const {
       data: { users },
       error,
     } = await supabase.auth.admin.listUsers()
-
     expect(error).toBeNull()
     expect(users).not.toBeNull()
     expect(users.length).toBeGreaterThanOrEqual(2)
@@ -118,11 +122,12 @@ class AuthenticationAPI extends Hooks {
     await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+
+    log('list users')
     const {
       data: { users },
       error,
     } = await supabase.auth.admin.listUsers()
-
     expect(error).not.toBeNull()
     expect(users).toHaveLength(0)
   }
@@ -136,12 +141,14 @@ class AuthenticationAPI extends Hooks {
     await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('sign in with email and password')
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: user.password,
     })
     expect(signInError).toBeNull()
 
+    log('list users')
     const {
       data: { users },
       error,
@@ -173,11 +180,11 @@ class AuthenticationAPI extends Hooks {
     const { user } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    log('get user')
     const {
       data: { user: foundUser },
       error,
     } = await supabase.auth.admin.getUserById(user.id)
-
     expect(error).toBeNull()
     expect(foundUser).not.toBeNull()
     expect(foundUser.id).toBe(user.id)
@@ -197,11 +204,11 @@ class AuthenticationAPI extends Hooks {
       email: faker.internet.exampleEmail(),
       phone: faker.phone.phoneNumber('!#!##!######'),
     }
+    log('update user')
     let {
       data: { user: resultUser },
       error,
     } = await this.updateWithRetries(supabase, user.id, updatedUser)
-
     expect(error).toBeNull()
     expect(resultUser).not.toBeNull()
     expect(resultUser.id).toBe(user.id)
@@ -223,6 +230,7 @@ class AuthenticationAPI extends Hooks {
     } = await supabase.auth.admin.deleteUser(user.id)
     expect(error).toBeNull()
 
+    log('get user by id')
     const {
       data: { user: foundUser },
       error: getError,
@@ -240,20 +248,22 @@ class AuthenticationAPI extends Hooks {
     const { user: villain } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    log('sign in with email and password')
     await supabase.auth.signInWithPassword({
       email: villain.email,
       password: villain.password,
     })
 
+    log('delete user')
     const {
       data: { user: deletedUser },
       error,
     } = await supabase.auth.admin.deleteUser(user.id)
-
     expect(error).not.toBeNull()
     expect(deletedUser).toBeNull()
 
     const sbAdmin = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    log('get user by id')
     const {
       data: { user: foundUser },
       error: getError,
@@ -286,6 +296,7 @@ class AuthenticationAPI extends Hooks {
       }
     }
 
+    log('create user')
     const {
       error,
       data: { user },
@@ -306,6 +317,7 @@ class AuthenticationAPI extends Hooks {
   async updateWithRetries(supabase: SupabaseClient, uid: string, attributes: AdminUserAttributes) {
     let result: UserResponse
     for (let i = 1; i < 5; i++) {
+      log(`update user by id: try ${i}`)
       result = await supabase.auth.admin.updateUserById(uid, attributes)
 
       if (result.error && result.error.name === 'AuthRetryableFetchError') {
