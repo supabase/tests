@@ -117,14 +117,16 @@ class Storage extends Hooks {
     expect(data.message).toBe('Successfully updated')
 
     bucket.public = !params.public
-    const { data: gotBucket } = await supabase.storage.getBucket(bucket.id)
+    log('get bucket after update')
+    const { data: gotBucket, error: getError } = await supabase.storage.getBucket(bucket.id)
+    expect(getError).toBeNull()
     expect(gotBucket).toEqual(bucket)
   }
 
   @feature(FEATURE.STORAGE)
   @severity(Severity.BLOCKER)
   @description('get bucket should return bucket info')
-  @test
+  @test()
   async 'delete bucket'() {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
@@ -133,7 +135,8 @@ class Storage extends Hooks {
     expect(error).toBeNull()
     expect(data.message).toBe('Successfully deleted')
 
-    const { data: buckets } = await supabase.storage.listBuckets()
+    const { data: buckets, error: errList } = await supabase.storage.listBuckets()
+    expect(errList).toBeNull()
     expect(
       buckets.map((b) => {
         return { name: b.name, id: b.id }

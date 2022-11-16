@@ -1,4 +1,4 @@
-import { params, retries, suite, test } from '@testdeck/jest'
+import { params, suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 

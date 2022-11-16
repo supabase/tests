@@ -1,4 +1,4 @@
-import { suite, test, timeout, retries } from '@testdeck/jest'
+import { suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 
@@ -13,8 +13,7 @@ class Authentication extends Hooks {
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.BLOCKER)
   @description('When user sign up then corresponding user in auth schema should be created')
-  @retries(2)
-  @test
+  @test()
   async 'signup should create user'() {
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
 
@@ -23,10 +22,21 @@ class Authentication extends Hooks {
       password: faker.internet.password(),
       username: faker.internet.userName(),
     }
-    const {
+    let {
       data: { user, session },
       error: signUpError,
     } = await this.signUp(supabase, fakeUser)
+    if (signUpError) {
+      log(signUpError.name, signUpError.message)
+      const {
+        data: { user: userTemp, session: sessionTemp },
+        error: signUpErrorTemp,
+      } = await this.signUp(supabase, fakeUser)
+      signUpError = signUpErrorTemp
+      user = userTemp
+      session = sessionTemp
+    }
+
     expect(signUpError).toBeNull()
     expect(user).toBeDefined()
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
