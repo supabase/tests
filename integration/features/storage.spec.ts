@@ -452,7 +452,13 @@ class Storage extends Hooks {
     Storage.buckets.push(bucket)
 
     log('list buckets')
-    const { data: buckets, error: listErr } = await supabase.storage.listBuckets()
+    let { data: buckets, error: listErr } = await supabase.storage.listBuckets()
+    if (listErr) {
+      log(listErr.name, listErr.message)
+      const { data: bucketsTemp, error: listErrTemp } = await supabase.storage.listBuckets()
+      buckets = bucketsTemp
+      listErr = listErrTemp
+    }
     expect(listErr).toBeNull()
     return buckets.find((b) => b.name === bucketName)
   }
