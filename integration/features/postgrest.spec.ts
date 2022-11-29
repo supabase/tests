@@ -55,9 +55,9 @@ class PostgREST extends Hooks {
     const { data: updUser, error } = await supabase
       .from('profiles')
       .update({
-        id: user.id,
         username: newName,
       })
+      .eq('id', user.id)
       .select()
     expect(error).toBeNull()
     expect(updUser.length).toEqual(1)
