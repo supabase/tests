@@ -300,7 +300,7 @@ class Authentication extends Hooks {
   @severity(Severity.NORMAL)
   @description('When user subscribes on auth changes then user has to receive auth updates')
   @test
-  async 'on auth state changed should return events'() {
+  async '[skip-stage] on auth state changed should return events'() {
     // create user
     const fakeUser = await this.createUser()
     const events: { event: AuthChangeEvent; token: string }[] = []

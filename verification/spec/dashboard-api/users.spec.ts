@@ -38,7 +38,7 @@ class Users extends Hooks {
   @severity(Severity.NORMAL)
   @description('invite new user via dashboard api')
   @test
-  async 'invite user'() {
+  async '[skip-stage] invite user'() {
     const fakeUser = {
       email: faker.internet.exampleEmail(),
     }

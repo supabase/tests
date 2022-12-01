@@ -50,7 +50,7 @@ class Realtime extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When you subscrive to realtime, you have to receive updates')
   @timeout(60000)
-  @test
+  @test.skip
   async '[skip-local] receive event when connected to realtime'() {
     let res: any
     let t: NodeJS.Timeout

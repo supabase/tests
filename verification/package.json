@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Smoke tests for supabase",
   "scripts": {
-    "test:stage": "NODE_ENV=staging jest",
+    "test:stage": "NODE_ENV=staging jest --testNamePattern '^((?!\\[skip-stage\\]).)*$'",
     "test:prod": "NODE_ENV=prod jest",
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
     "allure:serve": "node_modules/allure-commandline/bin/allure serve",
