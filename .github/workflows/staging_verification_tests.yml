@@ -2,7 +2,7 @@ name: Run verification tests against staging env
 
 on:
   schedule:
-    - cron: '0 4/12 * * *'
+    - cron: '0 8/12 * * *'
   # Webhook to trigger the workflow from other repositories
   repository_dispatch:
     types: [run-verification-stage]
@@ -162,21 +162,21 @@ jobs:
           folder: allure-history
           force: false
 
-  alert:
-    name: Alert slack if tests failed
-    if: ${{ failure() }}
-    needs: [verification, integration, report]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Notify slack
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_USERNAME: TestBot
-          SLACK_ICON_EMOJI: ':supa-eve:'
-          SLACK_LINK_NAMES: true
-          SLACK_TITLE: 'Staging Verification tests Failed'
-          SLACK_FOOTER: 'Supabase'
-          SLACK_COLOR: failure
-          SLACK_MESSAGE: 'Verification tests for Staging have finished with failure. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
+#   alert:
+#     name: Alert slack if tests failed
+#     if: ${{ failure() }}
+#     needs: [verification, integration, report]
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 10
+#     steps:
+#       - name: Notify slack
+#         uses: rtCamp/action-slack-notify@v2
+#         env:
+#           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+#           SLACK_USERNAME: TestBot
+#           SLACK_ICON_EMOJI: ':supa-eve:'
+#           SLACK_LINK_NAMES: true
+#           SLACK_TITLE: 'Staging Verification tests Failed'
+#           SLACK_FOOTER: 'Supabase'
+#           SLACK_COLOR: failure
+#           SLACK_MESSAGE: 'Verification tests for Staging have finished with failure. <https://supabase.github.io/test-reports/verification-stage/${{ github.run_number }}|See the report>'
