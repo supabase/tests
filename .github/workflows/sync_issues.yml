@@ -29,6 +29,7 @@ jobs:
         run: npm ci
 
       - name: Run sync
+        run: npm run sync
         env:
           GITHUB_TOKEN: ${{ secrets.BUGS_SYNC_GITHUB_TOKEN }}
           PROJECT_ID: ${{ secrets.BUGS_SYNC_PROJECT_ID }}
