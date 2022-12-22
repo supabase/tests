@@ -1,0 +1,14 @@
+{
+  "name": "gh-issues-export",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node index.js"
+  },
+  "dependencies": {
+    "@octokit/graphql": "^4.8.0",
+    "octokit": "^1.7.1"
+  }
+}
