@@ -7,7 +7,7 @@ on:
 
 jobs:
   autotests:
-    name: Run sync issues
+    name: Run Issues Sync
     strategy:
       matrix:
         node: ['14']
@@ -28,8 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Test
-        run: npm run sync
+      - name: Run sync
         env:
           GITHUB_TOKEN: ${{ secrets.BUGS_SYNC_GITHUB_TOKEN }}
           PROJECT_ID: ${{ secrets.BUGS_SYNC_PROJECT_ID }}
