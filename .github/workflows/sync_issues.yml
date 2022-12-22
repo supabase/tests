@@ -1,0 +1,37 @@
+name: Sync issues with bugs project
+on:
+  schedule:
+    - cron: '0 * * * *'
+  # Webhook to trigger the workflow from other repositories
+  workflow_dispatch:
+
+jobs:
+  autotests:
+    name: Run sync issues
+    strategy:
+      matrix:
+        node: ['14']
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./gh-bugs-project
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Test
+        run: npm run sync
+        env:
+          GITHUB_TOKEN: ${{ secrets.BUGS_SYNC_GITHUB_TOKEN }}
+          PROJECT_ID: ${{ secrets.BUGS_SYNC_PROJECT_ID }}
+          STATUS_ID: ${{ secrets.BUGS_SYNC_STATUS_ID }}
+          DONE_ID: ${{ secrets.BUGS_SYNC_DONE_ID }}
