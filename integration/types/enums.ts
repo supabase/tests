@@ -8,4 +8,5 @@ export enum FEATURE {
   POSTGREST = 'postgrest',
   FILTERS = 'postgrest_filters',
   MODIFIERS = 'postgrest_modifiers',
+  TRIGGERS = 'triggers',
 }

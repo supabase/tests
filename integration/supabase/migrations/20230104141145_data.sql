@@ -48,3 +48,26 @@ create policy "Anyone can upload an avatar."
 create policy "Anyone can update an avatar."
   on storage.objects for update
   with check ( bucket_id = 'avatars' );
+
+create table if not exists profile_inserts (
+  id serial,
+  user_id uuid,
+  username text,
+  inserted_at timestamp with time zone default now(),
+
+  primary key (id)
+);
+
+create or replace function insert_log() 
+returns trigger as $$
+begin
+    insert into profile_inserts ("user_id", "username")
+        values (NEW.id, NEW.username);
+    return NEW;
+end;
+$$ language plpgsql;
+
+create trigger profile_insert
+    before insert on profiles
+    for each row
+    execute function insert_log();

@@ -2,10 +2,10 @@ import assert from 'assert'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import { faker } from '@faker-js/faker'
-import { createClient } from '@supabase/supabase-js'
 
 import crossFetch from '../common/timeoutFetch'
 import { getAccessToken } from '../auth/getUserToken'
+import { waitForProjectStatus, waitForStorageReady } from '../common/helpers'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
@@ -20,7 +20,8 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
 
 ;(async () => {
   // login to supabase
-  const { apiKey } = await getAccessToken()
+  const { apiKey, contextDir } = await authenticate()
+
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     'content-type': 'application/json',
@@ -50,19 +51,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   const ref = project.ref
 
   // wait for project to be ready
-  for (let i = 0; i < 60; i++) {
-    try {
-      const statusResp = await crossFetch(`${supaPlatformUri}/projects/${ref}/status`, {
-        headers: headers,
-      })
-      assert(statusResp.status == 200)
-      const { status } = await statusResp.json()
-      assert(status == 'ACTIVE_HEALTHY')
-      break
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-    }
-  }
+  await waitForProjectStatus('ACTIVE_HEALTHY', supaPlatformUri, ref, headers)
 
   const statusResp = await crossFetch(
     `${supaPlatformUri}/projects/${ref}/status`,
@@ -77,6 +66,8 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
 
   // save project body to file
   project.db_pass = dbPass
+  project.apiKey = apiKey
+  project.contextDir = contextDir
   fs.writeFileSync(projectFile, JSON.stringify(project, null, 2))
   fs.writeFileSync(
     outputFile,
@@ -87,6 +78,8 @@ SUPABASE_GOTRUE=${project.endpoint}/auth/v1
 SUPABASE_URL=${project.endpoint}
 SUPABASE_KEY_ANON=${project.anon_key}
 SUPABASE_KEY_ADMIN=${project.service_key}
+ACCESS_TOKEN=${apiKey}
+CONTEXT_DIR=${contextDir}
 `
   )
 
@@ -122,14 +115,16 @@ SUPABASE_KEY_ADMIN=${project.service_key}
   }
 
   // wait for storage to be ready for project
-  for (let i = 0; i < 20; i++) {
-    try {
-      const supabase = createClient(project.endpoint, project.service_key)
-      const { error: errList } = await supabase.storage.listBuckets()
-      assert(errList == null)
-      break
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-    }
-  }
+  await waitForStorageReady(project.endpoint, project.service_key)
 })()
+
+async function authenticate() {
+  try {
+    const { apiKey, contextDir } = await getAccessToken()
+    return { apiKey, contextDir }
+  } catch (e) {
+    console.log(e)
+    const { apiKey, contextDir } = await getAccessToken()
+    return { apiKey, contextDir }
+  }
+}
