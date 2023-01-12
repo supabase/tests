@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 
 import crossFetch from '../common/timeoutFetch'
 import { getAccessToken } from '../auth/getUserToken'
-import { waitForProjectStatus } from '../common/helpers'
+import { waitForProjectStatus, waitForStorageReady } from '../common/helpers'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
@@ -66,5 +66,9 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   // wait for project to be restored
   console.log('Waiting for project to be active running...')
   await waitForProjectStatus('ACTIVE_HEALTHY', supaPlatformUri, project.ref, headers)
+
+  // wait for storage to be ready for project
+  console.log('Waiting for storage to be healthy...')
+  await waitForStorageReady(project.endpoint, project.service_key)
   console.log('Project is running again')
 })()

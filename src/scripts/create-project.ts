@@ -2,11 +2,10 @@ import assert from 'assert'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import { faker } from '@faker-js/faker'
-import { createClient } from '@supabase/supabase-js'
 
 import crossFetch from '../common/timeoutFetch'
 import { getAccessToken } from '../auth/getUserToken'
-import { waitForProjectStatus } from '../common/helpers'
+import { waitForProjectStatus, waitForStorageReady } from '../common/helpers'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
@@ -116,21 +115,7 @@ CONTEXT_DIR=${contextDir}
   }
 
   // wait for storage to be ready for project
-  let successfulStorageCalls = 0
-  for (let i = 0; i < 30; i++) {
-    try {
-      const supabase = createClient(project.endpoint, project.service_key)
-      const { error: errList } = await supabase.storage.listBuckets()
-      assert(errList == null)
-      successfulStorageCalls++
-      if (successfulStorageCalls == 10) {
-        break
-      }
-      await new Promise((resolve) => setTimeout(resolve, 200))
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-    }
-  }
+  await waitForStorageReady(project.endpoint, project.service_key)
 })()
 
 async function authenticate() {
