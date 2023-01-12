@@ -15,6 +15,8 @@ export default async function retriedFetch(
       console.log(`Retrying fetch ${i}`, res.status, res.statusText)
     } catch (e) {
       console.log(`Retrying fetch ${i}`, e)
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 200 * (i + 1)))
     }
   }
   return await timeoutFetch(input, init, timeout)
