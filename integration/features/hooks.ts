@@ -21,6 +21,17 @@ export abstract class Hooks {
     database: 'postgres',
     username: 'postgres',
     password: process.env.SUPABASE_DB_PASS,
+    types: {
+      bytea: {
+        to: 17,
+        from: 17,
+        serialize: (x: any) =>
+          x instanceof Uint8Array
+            ? '\\x' + Buffer.from(x, x.byteOffset, x.byteLength).toString('hex')
+            : x,
+        parse: (x: any) => Buffer.from(x.slice(2), 'hex'),
+      } as any,
+    },
   })
 
   @step('terminate sql connection')

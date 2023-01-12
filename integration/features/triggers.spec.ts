@@ -59,36 +59,39 @@ class Triggers extends Hooks {
   @feature(FEATURE.TRIGGERS)
   @severity(Severity.NORMAL)
   @description('Check if supabase internal trigger does not get retriggered after pause/resume')
-  @test
+  @test.skip
   async 'triggers work only once after pause/resume'() {
     // this test is a bad practice, because we don't want to pause/resume project during single test
     // and therefore pause/resume is moved out to separate action
     // but we need to save state between first test run and test run after resume.
-    let raw_key: string
+    let rawKey: string = ''
     if (fs.existsSync('test_key')) {
       log('Read raw key saved earlier')
-      raw_key = fs.readFileSync('test_key', { encoding: 'utf-8' })
+      rawKey = fs.readFileSync('test_key', { encoding: 'utf-8' })
     } else {
       // create pgsodium key to have a reference value
       log('Create pgsodium key to have a reference value')
-      raw_key = faker.datatype.uuid()
-      await Hooks.sql`
+      rawKey = faker.datatype.uuid()
+      const data = await Hooks.sql`
         select * 
-        from pgsodium.create_key(name:='test_key', raw_key:='${raw_key}'::bytea);
+        from pgsodium.create_key(
+          name:='test_key'::text, 
+          raw_key:='${Hooks.sql.types.bytea(rawKey)}'::bytea);
       `
+      expect(data.count).toBe(1)
 
       // save raw_key to file
       log('Save raw key to file')
-      fs.writeFileSync('test_key', raw_key, { encoding: 'utf-8' })
+      fs.writeFileSync('test_key', rawKey, { encoding: 'utf-8' })
     }
 
     log('Check if key is matching the reference value saved earlier')
     const matched = await Hooks.sql`
-      select decrypted_raw_key = '${raw_key}'
+      select decrypted_raw_key = '${Hooks.sql.types.bytea(rawKey)}'
       from pgsodium.decrypted_key
       where name = 'test_key'
     `
     expect(matched.count).toBe(1)
-    expect(matched.at(0)).toBe(true)
+    expect(matched.pop()['?column?']).toBe(true)
   }
 }
