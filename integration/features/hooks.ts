@@ -11,6 +11,7 @@ import {
   UserResponse,
 } from '@supabase/supabase-js'
 
+import retriedFetch from '../../src/common/retriedFetch'
 import { JasmineAllureReporter, step } from '../.jest/jest-custom-reporter'
 
 export abstract class Hooks {
@@ -40,6 +41,8 @@ export abstract class Hooks {
   ): SupabaseClient {
     options.auth = options.auth || {}
     options.auth.persistSession = false
+    options.global = options.global || {}
+    options.global.fetch = retriedFetch
 
     return createClient(url, key, options)
   }

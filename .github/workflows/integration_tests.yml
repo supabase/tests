@@ -41,6 +41,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .
+
       - uses: supabase/setup-cli@v1
       - run: supabase start
 

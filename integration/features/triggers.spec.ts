@@ -59,7 +59,7 @@ class Triggers extends Hooks {
   @feature(FEATURE.TRIGGERS)
   @severity(Severity.NORMAL)
   @description('Check if supabase internal trigger does not get retriggered after pause/resume')
-  @test.skip
+  @test
   async 'triggers work only once after pause/resume'() {
     // this test is a bad practice, because we don't want to pause/resume project during single test
     // and therefore pause/resume is moved out to separate action
@@ -72,7 +72,10 @@ class Triggers extends Hooks {
       // create pgsodium key to have a reference value
       log('Create pgsodium key to have a reference value')
       raw_key = faker.datatype.uuid()
-      await Hooks.sql`select * from pgsodium.create_key(name:='test_key', raw_key:='${raw_key}'::text);`
+      await Hooks.sql`
+        select * 
+        from pgsodium.create_key(name:='test_key', raw_key:='${raw_key}'::bytea);
+      `
 
       // save raw_key to file
       log('Save raw key to file')

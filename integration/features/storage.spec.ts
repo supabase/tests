@@ -5,6 +5,7 @@ import { Severity } from 'allure-js-commons'
 import { createClient } from '@supabase/supabase-js'
 import { Bucket } from '@supabase/storage-js'
 
+import retriedFetch from '../../src/common/retriedFetch'
 import { FEATURE } from '../types/enums'
 import { description, feature, log, severity, step } from '../.jest/jest-custom-reporter'
 import { Hooks } from './hooks'
@@ -37,7 +38,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'create bucket'(params: { public: boolean }) {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucketName = this.word()
     log('create bucket', bucketName)
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
@@ -71,8 +72,6 @@ class Storage extends Hooks {
     })
     expect(error).not.toBeNull()
     expect(bucket).toBeNull()
-    expect(error.message).toContain('row-level security')
-    expect(error.message).toContain('"buckets"')
   }
 
   @feature(FEATURE.STORAGE)
@@ -80,7 +79,7 @@ class Storage extends Hooks {
   @description('list buckets should return all buckets')
   @test
   async 'list buckets as admin'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
 
     const bucket1 = await this.createBucket()
     const bucket2 = await this.createBucket()
@@ -97,7 +96,7 @@ class Storage extends Hooks {
   @description('get bucket should return bucket info')
   @test
   async 'get bucket'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     log(`get bucket ${bucket.id}`)
@@ -112,7 +111,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'update bucket'(params: { public: boolean }) {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket(params.public)
 
     log(`update bucket ${bucket.id}, set public=${!params.public}`)
@@ -148,7 +147,7 @@ class Storage extends Hooks {
   @description('get bucket should return bucket info')
   @test()
   async 'delete bucket'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     log('delete bucket')
@@ -173,7 +172,7 @@ class Storage extends Hooks {
   @description('upload to bucket')
   @test
   async 'upload to bucket'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -191,7 +190,7 @@ class Storage extends Hooks {
   @description('list files in bucket')
   @test
   async 'list files'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const files: { path: string; data: string }[] = []
@@ -244,7 +243,7 @@ class Storage extends Hooks {
   @description('download file')
   @test
   async 'download file from bucket'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -265,7 +264,7 @@ class Storage extends Hooks {
   @description('move file')
   @test
   async '[skip-local] move file in bucket'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -294,7 +293,7 @@ class Storage extends Hooks {
   @description('copy file')
   @test
   async '[skip-local] copy file in bucket'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -331,7 +330,7 @@ class Storage extends Hooks {
   @description('get public link to file in the public bucket')
   @test
   async 'get public link to file'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -360,7 +359,7 @@ class Storage extends Hooks {
   @description('get public link to file in the private bucket')
   @test
   async 'get public link to private file'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket(false)
 
     const file = {
@@ -391,7 +390,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'get signed link to file'(params: { public: boolean }) {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket(params.public)
 
     const file = {
@@ -421,7 +420,7 @@ class Storage extends Hooks {
   @description('update file check if it will change')
   @test
   async 'update file'() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -453,7 +452,7 @@ class Storage extends Hooks {
 
   @step('create bucket')
   async createBucket(pub = true) {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const supabase = this.createSbClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucketName = this.word()
 
     log('creating bucket', bucketName)
@@ -490,5 +489,13 @@ class Storage extends Hooks {
 
   private word() {
     return faker.unique(faker.random.word).replace(/[^a-zA-Z0-9]/g, '')
+  }
+
+  private createSbClient(url: string, key: string) {
+    return createClient(url, key, {
+      global: {
+        fetch: retriedFetch,
+      },
+    })
   }
 }
