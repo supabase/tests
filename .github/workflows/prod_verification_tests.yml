@@ -95,6 +95,22 @@ jobs:
       - name: Run integration tests
         run: npm run test:prod
         working-directory: integration
+        env:
+          CLEANUP_USERS: false
+
+      - name: Pause and restore project
+        run: npm run project:restore
+        env:
+          GITHUB_TOTP: ${{ secrets.VERIFICATION_PROD_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.VERIFICATION_PROD_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.VERIFICATION_PROD_GITHUB_PASS }}
+          SUPA_PLATFORM_URI: 'https://api.supabase.io/platform'
+          SUPA_DASHBOARD: 'https://app.supabase.io'
+          PROJECT_JSON: 'project.json'
+
+      - name: Integration tests second run
+        run: npm run test:prod
+        working-directory: integration
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}

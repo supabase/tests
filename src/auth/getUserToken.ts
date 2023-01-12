@@ -8,6 +8,13 @@ import assert from 'assert'
 
 // a bit too complicated to do auth with github via API, so we do authorization with GUI
 const getAccessToken = async () => {
+  if (process.env.ACCESS_TOKEN && process.env.CONTEXT_DIR) {
+    return {
+      apiKey: process.env.GITHUB_TOKEN,
+      contextDir: process.env.CONTEXT_DIR,
+    }
+  }
+
   const githubTotp = process.env.GITHUB_TOTP
   const githubUser = process.env.GITHUB_USER
   const githubPass = process.env.GITHUB_PASS
@@ -38,9 +45,9 @@ const getAccessToken = async () => {
     const page = await context.newPage()
     await page.goto(supaDashboard)
     try {
-      await page.locator('button:has-text("Sign In with GitHub")').first().click()
-    } catch {
       await page.locator('button:has-text("Continue with GitHub")').first().click()
+    } catch {
+      await page.locator('button:has-text("Sign In with GitHub")').first().click()
     }
     // REdirected to GitHub: interact with login form
     await page.fill('input[name="login"]', githubUser)
@@ -75,7 +82,7 @@ const getAccessToken = async () => {
 
     // Wait for redirect back to app.supabase.io(.green)
     try {
-      await page.waitForNavigation({ url: /app.supabase./ })
+      await page.waitForNavigation({ url: /app.supabase./, waitUntil: 'networkidle' })
     } catch {
       // a bit hard to make this reliable: we can sometimes not hit this wait condition and
       // navigation will happen before we this call, and then we will receive an error;

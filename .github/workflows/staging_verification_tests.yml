@@ -95,6 +95,22 @@ jobs:
       - name: Run integration tests
         run: npm run test:stage
         working-directory: integration
+        env:
+          CLEANUP_USERS: false
+
+      - name: Pause and restore project
+        run: npm run project:restore
+        env:
+          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
+          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
+          SUPA_DASHBOARD: 'https://app.supabase.green'
+          PROJECT_JSON: 'project.json'
+
+      - name: Integration tests second run
+        run: npm run test:stage
+        working-directory: integration
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
@@ -161,7 +177,6 @@ jobs:
           branch: gh-pages
           folder: allure-history
           force: false
-
 #   alert:
 #     name: Alert slack if tests failed
 #     if: ${{ failure() }}

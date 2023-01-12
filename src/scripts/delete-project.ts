@@ -14,7 +14,12 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   // read project ref from file
   const project = JSON.parse(fs.readFileSync(projectFile, 'utf8'))
 
-  const { apiKey } = await getAccessToken()
+  if (!project.apiKey) {
+    const { apiKey } = await getAccessToken()
+    project.apiKey = apiKey
+  }
+  const apiKey = project.apiKey
+
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     'content-type': 'application/json',
@@ -28,5 +33,8 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     },
     15000
   )
-  assert(deleteResp.status == 200)
+  assert(
+    deleteResp.status == 200,
+    `Failed to delete project ${deleteResp.status}: ${deleteResp.statusText}`
+  )
 })()

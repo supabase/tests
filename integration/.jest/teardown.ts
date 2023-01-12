@@ -1,6 +1,12 @@
 import { createClient, User, UserResponse } from '@supabase/supabase-js'
 
 const removeAllUsers = async () => {
+  const removalRequired = process.env.CLEANUP_USERS ?? true
+  console.log('removalRequired', removalRequired)
+  if (removalRequired == 'false') {
+    return
+  }
+
   const sb = createClient(
     process.env.SUPABASE_URL as string,
     process.env.SUPABASE_KEY_ADMIN as string
