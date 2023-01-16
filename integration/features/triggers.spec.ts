@@ -15,6 +15,7 @@ class Triggers extends Hooks {
   @description('Insert user profile to trigger the a according trigger')
   @test
   async 'trigger works'() {
+    // check out supabase/migrartions/20230104141145_data.sql to see profile_insert trigger
     const { supabase, user } = await this.createSignedInSupaClient()
 
     // insert profile to trigger profile_insert trigger
@@ -32,66 +33,5 @@ class Triggers extends Hooks {
       .eq('user_id', profileInserted.id)
 
     expect(event.data.length).toBe(1)
-  }
-
-  @feature(FEATURE.TRIGGERS)
-  @severity(Severity.NORMAL)
-  @description('Check if there are any duplicated in table with triggered inserts')
-  @test
-  async 'trigger works only once'() {
-    const { supabase, user } = await this.createSignedInSupaClient()
-
-    // insert profile to trigger profile_insert trigger
-    const {
-      data: [profileInserted],
-      error: errorInsert,
-    } = await this.insertProfile(supabase, user, user)
-    expect(errorInsert).toBeNull()
-    expect(profileInserted.username).toMatch(user.username)
-
-    // check if there are rows with duplicate username in profile_insert table
-    log('Check if there are rows with duplicate username in profile_insert table')
-    const duplicates =
-      await Hooks.sql`SELECT username, COUNT(*) FROM profile_inserts GROUP BY username HAVING COUNT(*) > 1`
-    expect(duplicates.count).toBe(0)
-  }
-
-  @feature(FEATURE.TRIGGERS)
-  @severity(Severity.NORMAL)
-  @description('Check if supabase internal trigger does not get retriggered after pause/resume')
-  @test.skip
-  async 'triggers work only once after pause/resume'() {
-    // this test is a bad practice, because we don't want to pause/resume project during single test
-    // and therefore pause/resume is moved out to separate action
-    // but we need to save state between first test run and test run after resume.
-    let rawKey: string = ''
-    if (fs.existsSync('test_key')) {
-      log('Read raw key saved earlier')
-      rawKey = fs.readFileSync('test_key', { encoding: 'utf-8' })
-    } else {
-      // create pgsodium key to have a reference value
-      log('Create pgsodium key to have a reference value')
-      rawKey = faker.datatype.uuid()
-      const data = await Hooks.sql`
-        select * 
-        from pgsodium.create_key(
-          name:='test_key'::text, 
-          raw_key:='${Hooks.sql.types.bytea(rawKey)}'::bytea);
-      `
-      expect(data.count).toBe(1)
-
-      // save raw_key to file
-      log('Save raw key to file')
-      fs.writeFileSync('test_key', rawKey, { encoding: 'utf-8' })
-    }
-
-    log('Check if key is matching the reference value saved earlier')
-    const matched = await Hooks.sql`
-      select decrypted_raw_key = '${Hooks.sql.types.bytea(rawKey)}'
-      from pgsodium.decrypted_key
-      where name = 'test_key'
-    `
-    expect(matched.count).toBe(1)
-    expect(matched.pop()['?column?']).toBe(true)
   }
 }

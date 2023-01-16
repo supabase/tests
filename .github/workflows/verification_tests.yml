@@ -84,6 +84,7 @@ jobs:
         run: |
           npm run project:create
           cp .env.migrate integration/.env.staging
+          cp .env.migrate restore/.env.staging
           npm run project:migrate
           echo $(cat project.json | jq -r ".ref")
 
@@ -96,6 +97,14 @@ jobs:
         working-directory: integration
         env:
           CLEANUP_USERS: false
+
+      - name: Install dependencies (restore tests)
+        run: npm ci
+        working-directory: restore
+
+      - name: Run restore tests
+        run: npm run test:stage
+        working-directory: restore
 
       - name: Pause and restore project
         run: npm run project:restore
@@ -116,6 +125,13 @@ jobs:
         with:
           name: allure-results-integration-stage
           path: integration/allure-results
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: allure-results-restore-stage
+          path: restore/allure-results
           retention-days: 1
 
       - name: Remove project
