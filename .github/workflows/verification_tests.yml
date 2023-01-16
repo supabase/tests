@@ -102,8 +102,8 @@ jobs:
         run: npm ci
         working-directory: restore
 
-      - name: Run restore tests
-        run: npm run test:stage
+      - name: Run restore tests preparation
+        run: npm run prepare:stage
         working-directory: restore
 
       - name: Pause and restore project
@@ -115,6 +115,10 @@ jobs:
           SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
           SUPA_DASHBOARD: 'https://app.supabase.green'
           PROJECT_JSON: 'project.json'
+
+      - name: Run restore tests
+        run: npm run test:stage
+        working-directory: restore
 
       - name: Integration tests second run
         run: npm run test:stage
