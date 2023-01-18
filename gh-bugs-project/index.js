@@ -42,13 +42,13 @@ console.log(JSON.stringify(ids))
 console.log(ids.length)
 
 const addItemToProject = async (item) => {
-  const { addProjectNextItem } = await gql({
-    query: `mutation addProjectNextItem {
-      addProjectNextItem(input: {
+  const { addProjectV2ItemById } = await gql({
+    query: `mutation addProjectV2ItemById {
+      addProjectV2ItemById(input: {
         projectId: \"${project}\"
         contentId: \"${item.id}\"
       }) {
-        projectNextItem {
+        item {
           id
         }
       }
@@ -56,14 +56,16 @@ const addItemToProject = async (item) => {
   })
   if (item.state === 'closed') {
     await gql({
-      query: `mutation updateProjectNextItemField {
-      updateProjectNextItemField(input: {
+      query: `mutation updateProjectV2ItemFieldValue {
+        updateProjectV2ItemFieldValue(input: {
         projectId: \"${project}\"
-        itemId: \"${addProjectNextItem.projectNextItem.id}\"
+        itemId: \"${addProjectV2ItemById.item.id}\"
         fieldId: \"${status}\"
-        value: \"${done}\"
+        value: {
+          singleSelectOptionId: \"${done}\"
+        }
       }) {
-        projectNextItem {
+        projectV2Item {
           id
         }
       }
