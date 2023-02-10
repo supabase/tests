@@ -177,12 +177,9 @@ class Tables extends Hooks {
         'authenticator',
         'supabase_auth_admin',
         'supabase_storage_admin',
-        'pg_database_owner',
-        'pg_read_all_data',
         'dashboard_user',
         'service_role',
         'pgbouncer',
-        'pg_write_all_data',
       ])
     )
   }
