@@ -55,7 +55,7 @@ const getAccessToken = async () => {
     await page.click('input[name="commit"]')
 
     // Pass 2FA
-    await page.fill('input[name="otp"]', totp.generate())
+    await page.fill('input[name="app_otp"]', totp.generate())
     // In case verification has not started automatically on code submission
     try {
       if (
