@@ -6,7 +6,6 @@ on:
       - 'verification/**'
       - 'integration/**'
       - 'src/**'
-      - '.github/workflows/*'
 
 jobs:
   verification:
