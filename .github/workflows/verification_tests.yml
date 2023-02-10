@@ -6,7 +6,6 @@ on:
       - 'verification/**'
       - 'integration/**'
       - 'src/**'
-      - '.github/workflows/*'
 
 jobs:
   verification:
@@ -25,6 +24,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -67,6 +67,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
