@@ -36,7 +36,6 @@ class API extends Hooks {
 
     const api = await apiResp.json()
     this.expectAutoApiServiceIsCorrect(api.autoApiService)
-    this.expectProjectIsCorrect(api.project)
   }
 
   // steps

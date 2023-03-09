@@ -10,7 +10,7 @@ import { Hooks } from './hooks'
 
 @suite('[gui] project')
 class Project extends Hooks {
-  @feature(FEATURE.SETTINGS)
+  @feature(FEATURE.PROJECT)
   @severity(Severity.NORMAL)
   @description('create new project using gui dashboard')
   @timeout(300000)
