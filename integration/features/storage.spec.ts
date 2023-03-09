@@ -102,8 +102,8 @@ class Storage extends Hooks {
     log(`get bucket ${bucket.id}`)
     const { data: gotBucket, error } = await supabase.storage.getBucket(bucket.id)
     expect(error).toBeNull()
-    ;(bucket as any).allowed_mime_types = null
-    ;(bucket as any).file_size_limit = 0 // todo: looks wrong
+    delete (gotBucket as any).allowed_mime_types
+    delete (gotBucket as any).file_size_limit // todo: looks wrong
     expect(gotBucket).toEqual(bucket)
   }
 
@@ -141,8 +141,8 @@ class Storage extends Hooks {
       getError = errorTemp
     }
     expect(getError).toBeNull()
-    ;(bucket as any).allowed_mime_types = null
-    ;(bucket as any).file_size_limit = 0 // todo: looks wrong
+    delete (gotBucket as any).allowed_mime_types
+    delete (gotBucket as any).file_size_limit // todo: looks wrong
     expect(gotBucket).toEqual(bucket)
   }
 
