@@ -10,4 +10,5 @@ export enum FEATURE {
   SETTINGS = 'settings',
   DATABASE = 'database',
   PROJECT = 'project',
+  FORMS = 'forms',
 }
