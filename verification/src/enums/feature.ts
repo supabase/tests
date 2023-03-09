@@ -9,4 +9,5 @@ export enum FEATURE {
   API = 'api',
   SETTINGS = 'settings',
   DATABASE = 'database',
+  PROJECT = 'project',
 }

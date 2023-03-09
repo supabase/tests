@@ -18,7 +18,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     const { apiKey } = await getAccessToken()
     project.apiKey = apiKey
   }
-  const apiKey = project.apiKey
+  let apiKey = project.apiKey
 
   const headers = {
     Authorization: `Bearer ${apiKey}`,
@@ -33,8 +33,26 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     },
     15000
   )
+
+  // if token expired, refresh token and try again
+  if (deleteResp.status == 401) {
+    // refresh token
+    const { apiKey } = await getAccessToken()
+    project.apiKey = apiKey
+  }
+  apiKey = project.apiKey
+  headers.Authorization = `Bearer ${apiKey}`
+  const deleteResp2 = await crossFetch(
+    `${supaPlatformUri}/projects/${project.ref}`,
+    {
+      method: 'DELETE',
+      headers: headers,
+    },
+    15000
+  )
+
   assert(
-    deleteResp.status == 200,
+    deleteResp2.status == 200,
     `Failed to delete project ${deleteResp.status}: ${deleteResp.statusText}`
   )
 })()
