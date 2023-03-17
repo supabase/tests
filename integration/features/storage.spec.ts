@@ -492,7 +492,7 @@ class Storage extends Hooks {
   }
 
   private word() {
-    return faker.unique(faker.random.word).replace(/[^a-zA-Z0-9]/g, '')
+    return faker.unique(faker.datatype.uuid).replace(/[^a-zA-Z0-9]/g, '')
   }
 
   private createSbClient(url: string, key: string) {
