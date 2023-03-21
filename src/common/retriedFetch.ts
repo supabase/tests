@@ -4,7 +4,8 @@ export default async function retriedFetch(
   input: RequestInfo,
   init?: RequestInit,
   timeout: number = 5000,
-  retries: number = 3
+  retries: number = 3,
+  delayBase: number = 200
 ): Promise<Response> {
   for (let i = 0; i < retries - 1; i++) {
     try {
@@ -16,7 +17,7 @@ export default async function retriedFetch(
     } catch (e) {
       console.log(`Retrying fetch ${i}`, e)
     } finally {
-      await new Promise((resolve) => setTimeout(resolve, 200 * (i + 1)))
+      await new Promise((resolve) => setTimeout(resolve, delayBase * (i + 1)))
     }
   }
   return await timeoutFetch(input, init, timeout)
