@@ -48,6 +48,7 @@ jobs:
           SUPA_META_URI: 'https://api.supabase.io/platform/pg-meta'
           SUPA_PROJECT_DOMAIN: 'supabase.co'
           SUPA_DASHBOARD: 'https://app.supabase.io'
+          HUBSPOT_API_KEY: ${{ secrets.VERIFICATION_PROD_HUBSPOT_API_KEY }}
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
