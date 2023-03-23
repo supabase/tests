@@ -31,7 +31,8 @@ const projectsFile = process.env.PROJECTS_JSON || 'projects.json'
 
   // create projects
   const refs = []
-  const batchSize = 5
+  const batchSize = 10
+  fs.writeFileSync(projectsFile, '[\n')
   console.time('create projects')
   for (let i = 0; i < projectsCount / batchSize; i++) {
     console.time('create projects batch ' + i)
@@ -77,6 +78,9 @@ const projectsFile = process.env.PROJECTS_JSON || 'projects.json'
     console.timeEnd('create projects batch ' + i)
     console.timeLog('create projects', i)
     refs.push(...results.filter((ref) => ref != ''))
+    results
+      .filter((ref) => ref != '')
+      .map((ref) => fs.appendFileSync(projectsFile, `  "${ref}",\n`))
   }
   console.timeEnd('create projects')
 
