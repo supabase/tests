@@ -90,6 +90,7 @@ typings/
 .env.migrate
 
 project.json
+projects.json
 restore/temp/*
 !restore/temp/.gitkeep
 
