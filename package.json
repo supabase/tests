@@ -6,7 +6,9 @@
     "project:migrate": "NODE_ENV=migrate MIGRATIONS_FILE=./integration/supabase/migrations/20230104141145_data.sql ts-node-esm ./src/scripts/apply-migrations.ts",
     "project:restore": "ts-node-esm ./src/scripts/restore-project.ts",
     "project:create": "ts-node-esm ./src/scripts/create-project.ts",
-    "project:delete": "ts-node-esm ./src/scripts/delete-project.ts"
+    "project:delete": "ts-node-esm ./src/scripts/delete-project.ts",
+    "projects:create": "ts-node-esm ./src/scripts/create-projects.ts",
+    "projects:delete": "ts-node-esm ./src/scripts/delete-projects.ts"
   },
   "author": "Supabase, Inc.",
   "license": "MIT",
