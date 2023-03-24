@@ -14,7 +14,7 @@ class Forms extends Hooks {
   @feature(FEATURE.FORMS)
   @severity(Severity.NORMAL)
   @description('create support request from project page')
-  @timeout(60000)
+  @timeout(180000)
   @test
   async '[skip-stage] new ticket from project'() {
     const page = await this.browserCtx.newPage()
@@ -168,7 +168,7 @@ class Forms extends Hooks {
   }
 
   private async searchTickets(): Promise<TicketsResponse> {
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 10; i++) {
       const ticketsResp = await crossFetch(
         'https://api.hubapi.com/crm/v3/objects/tickets/search',
         {
