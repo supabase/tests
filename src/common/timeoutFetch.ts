@@ -1,5 +1,5 @@
 import crossFetch from 'cross-fetch'
-import timeoutPromise from './timeout'
+import timeoutPromise from './timeout.js'
 
 export default async function fetch(
   input: RequestInfo,

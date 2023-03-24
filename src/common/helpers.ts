@@ -2,7 +2,7 @@ import assert from 'assert'
 
 import { createClient } from '@supabase/supabase-js'
 
-import crossFetch from '../common/timeoutFetch'
+import crossFetch from '../common/timeoutFetch.js'
 
 export async function waitForProjectStatus(
   expectedStatus: string,
@@ -12,6 +12,7 @@ export async function waitForProjectStatus(
 ) {
   for (let i = 0; i < 60; i++) {
     try {
+      process.stdout.write('.')
       const statusResp = await crossFetch(`${supaUri}/projects/${ref}/status`, {
         headers: headers,
       })
