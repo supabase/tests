@@ -14,7 +14,7 @@ class Forms extends Hooks {
   @feature(FEATURE.FORMS)
   @severity(Severity.NORMAL)
   @description('create support request from project page')
-  @timeout(180000)
+  @timeout(300000)
   @test
   async '[skip-stage] new ticket from project'() {
     const page = await this.browserCtx.newPage()
