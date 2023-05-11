@@ -6,6 +6,14 @@ on:
         description: supabase dashboard url
         required: true
 
+      platform_uri:
+        type: choice
+        description: api uri for platform 1. io - prod 2. green - stage
+        required: true
+        options:
+          - 'https://api.supabase.io/platform'
+          - 'https://api.supabase.green/platform'
+
       project_ref:
         type: choice
         description: project ref for tests 1. bwh - prod 2. hwm - stage
@@ -45,6 +53,7 @@ jobs:
           GITHUB_USER: ${{ secrets.VERIFICATION_PROD_GITHUB_USER }}
           GITHUB_PASS: ${{ secrets.VERIFICATION_PROD_GITHUB_PASS }}
           SUPA_DASHBOARD: ${{ github.event.inputs.url }}
+          SUPA_PLATFORM_URI: ${{ github.event.inputs.platform_uri }}
           FE_TESTS_PROJECT_REF: ${{ github.event.inputs.project_ref }}
           FE_TESTS_PROJECT_NAME: 'frontend-tests'
           FE_TESTS_ACTOR_INFO_VIEW_ID: ${{ github.event.inputs.view_id }}
