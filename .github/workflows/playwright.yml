@@ -14,6 +14,13 @@ on:
           - 'https://api.supabase.io/platform'
           - 'https://api.supabase.green/platform'
 
+      node_env:
+        type: choice
+        required: true
+        options:
+          - prod
+          - staging
+
       project_ref:
         type: choice
         description: project ref for tests 1. bwh - prod 2. hwm - stage
@@ -49,6 +56,7 @@ jobs:
         run: npx playwright test -c ./frontend/playwright.config.ts
         env:
           CI: true
+          NODE_ENV: ${{ github.event.inputs.node_env }}
           GITHUB_TOTP: ${{ secrets.VERIFICATION_PROD_GITHUB_TOTP }}
           GITHUB_USER: ${{ secrets.VERIFICATION_PROD_GITHUB_USER }}
           GITHUB_PASS: ${{ secrets.VERIFICATION_PROD_GITHUB_PASS }}
