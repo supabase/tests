@@ -2,7 +2,7 @@ name: Run verification tests against production env
 
 on:
   schedule:
-    - cron: '0 5/8 * * *'
+    - cron: '0 4/8 * * *'
   # Webhook to trigger the workflow from other repositories
   repository_dispatch:
     types: [run-verification-prod]
