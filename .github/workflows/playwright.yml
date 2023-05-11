@@ -1,0 +1,55 @@
+name: Playwright Tests
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: supabase dashboard url
+        required: true
+
+      project_ref:
+        type: choice
+        description: project ref for tests 1. bwh - prod 2. hwm - stage
+        required: true
+        options:
+          - bwhmrdxxwjfmrelopnji
+          - hwmqcqbzihriioxfvgvr
+
+      view_id:
+        type: choice
+        description: view id for tests 1. 28630 - prod 2. 28654 - stage
+        required: true
+        options:
+          - '28630'
+          - '28654'
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          CI: true
+          GITHUB_TOTP: ${{ secrets.VERIFICATION_PROD_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.VERIFICATION_PROD_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.VERIFICATION_PROD_GITHUB_PASS }}
+          SUPA_DASHBOARD: ${{ github.event.inputs.url }}
+          FE_TESTS_PROJECT_REF: ${{ github.event.inputs.project_ref }}
+          FE_TESTS_PROJECT_NAME: 'frontend-tests'
+          FE_TESTS_ACTOR_INFO_VIEW_ID: ${{ github.event.inputs.view_id }}
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
