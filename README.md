@@ -36,3 +36,63 @@ Tests that check if supabase-js client library works correctly with Supabase ser
 Additional tests that check if Supabase project works correctly after pause and restore procedure. Preparation steps (to run before pause-restore) should be placed in `preparations` directory, it will be run all together before project is paused. And then after project is restored, tests will run.
 
 This may not be the best practice, but it significantly increases tests speed, because pause and restore action will be run only once.
+
+### frontend
+
+Tests for supabase dashboard. Place for e2e and integration tests.
+
+## How to run
+
+To run locally you need to download .env file from bitwarden for environment you are going to use: either `staging` or `prod` and put it in `.env.staging` or `.env.prod` file.
+
+Run `npm install` to install dependencies. And then run `npm install` in each project you want to run tests from.
+
+### integration tests
+
+To run integration tests against staging or prod environment you have to create a project first:
+
+```bash
+NODE_ENV=staging npm run project:create
+cp .env .env.migrate
+npm run project:migrate
+cp .env integration/.env.staging
+```
+
+```bash
+NODE_ENV=prod npm run project:create
+cp .env .env.migrate
+npm run project:migrate
+cp .env integration/.env.prod
+```
+
+Then go to the integration tests folder `cd integration` and run `npm run test:stage` or `npm run test:prod`.
+
+Don't forget to delete project after you've done with it:
+
+```bash
+NODE_ENV=prod npm run project:delete
+```
+
+```bash
+NODE_ENV=staging npm run project:delete
+```
+
+### frontend tests
+
+Install dependencies in `/frontend`. And run `npx playwright install --with-deps` to install browsers for playwright. Make sure you pulled .env for staging or prod and run either:
+
+```bash
+npm run test:frontend:stage
+```
+
+```bash
+npm run test:frontend:prod
+```
+
+To run tests against vercel preview build just change the following env in `.env.staging`:
+
+```bash
+SUPA_DASHBOARD='https://supabase-studio-staging-...-supabase.vercel.app'
+```
+
+There is one limitation currently: playwright UI can work for about 10 minutes only, cause gotrue token will expire after.
