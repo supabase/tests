@@ -15,6 +15,13 @@ export async function waitForProjectStatus(
       const statusResp = await crossFetch(`${supaUri}/projects/${ref}/status`, {
         headers: headers,
       })
+      if (statusResp.status != 200) {
+        console.log(
+          `Failed to get project status ${statusResp.statusText} ${
+            statusResp.status
+          } ${await statusResp.text()}`
+        )
+      }
       assert(statusResp.status == 200)
       const { status } = await statusResp.json()
       assert(status == expectedStatus)
@@ -26,7 +33,7 @@ export async function waitForProjectStatus(
 }
 
 export async function waitForStorageReady(endpoint: string, serviceKey: string) {
-  await new Promise((resolve) => setTimeout(resolve, 75*1000))
+  await new Promise((resolve) => setTimeout(resolve, 75 * 1000))
   let successfulStorageCalls = 0
   for (let i = 0; i < 30; i++) {
     try {

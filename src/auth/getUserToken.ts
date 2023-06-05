@@ -82,12 +82,15 @@ const getAccessToken = async () => {
 
     // Wait for redirect back to app.supabase.io(.green)
     try {
-      await page.waitForNavigation({ url: /app.supabase./, waitUntil: 'networkidle' })
+      await page.waitForURL(/app.supabase./, { waitUntil: 'networkidle' })
     } catch {
+      // todo: we used `waitForNavigation` before and it is now deprecated cause it was racy
+      // todo: i am leaving this try catch here temporarily to see if it will be racy or not now
       // a bit hard to make this reliable: we can sometimes not hit this wait condition and
       // navigation will happen before we this call, and then we will receive an error;
       // but if we omit this completely, we will get an error on the next call cause
       // we will be at the moment before redirect actually happens during the next call
+      console.log('waitForURL failed')
     }
     await page.locator('button:has-text("New project")').first().isVisible()
 

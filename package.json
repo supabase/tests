@@ -6,7 +6,9 @@
     "project:migrate": "NODE_ENV=migrate MIGRATIONS_FILE=./integration/supabase/migrations/20230104141145_data.sql ts-node-esm ./src/scripts/apply-migrations.ts",
     "project:restore": "ts-node-esm ./src/scripts/restore-project.ts",
     "project:create": "ts-node-esm ./src/scripts/create-project.ts",
-    "project:delete": "ts-node-esm ./src/scripts/delete-project.ts"
+    "project:delete": "ts-node-esm ./src/scripts/delete-project.ts",
+    "test:frontend:stage": "NODE_ENV=staging playwright test -c ./frontend/playwright.config.ts --ui",
+    "test:frontend:prod": "NODE_ENV=prod playwright test -c ./frontend/playwright.config.ts --ui"
   },
   "author": "Supabase, Inc.",
   "license": "MIT",
