@@ -45,7 +45,7 @@ Tests for supabase dashboard. Place for e2e and integration tests.
 
 ## How to run
 
-To run locally you need to download .env file from bitwarden for environment you are going to use: either `staging` or `prod` and put it in `.env.staging` or `.env.prod` file.
+To run locally you need to download `.env` files from Bitwarden for the environment you are going to use: either `staging` or `prod`. Put these in the root directory in `.env.staging` or `.env.prod`.
 
 Run `npm install` to install dependencies. And then run `npm install` in each project you want to run tests from.
 
@@ -83,15 +83,13 @@ NODE_ENV=staging npm run project:delete
 
 ### frontend tests
 
-Install dependencies in `/frontend`. And run `npx playwright install --with-deps` to install browsers for playwright. Make sure you pulled .env for staging or prod and run either:
+Make sure you've got `.env.prod` and/or `.env.staging` from Bitwarden in the root directory. Then:
 
-```bash
-npm run test:frontend:stage
-```
-
-```bash
-npm run test:frontend:prod
-```
+1. Navigate to `/frontend`
+2. `npm i`
+3. `npx playwright install --with-deps` to install browsers for Playwright
+4. Navigate back to the root directory
+5. Run either: `npm run test:frontend:stage` or `npm run test:frontend:prod`
 
 To run tests against vercel preview build just change the following env in `.env.staging`:
 
@@ -99,9 +97,11 @@ To run tests against vercel preview build just change the following env in `.env
 SUPA_DASHBOARD='https://supabase-studio-staging-...-supabase.vercel.app'
 ```
 
+This will open the Playwright interface (expect 10-20s delay). When that opens hit the Play button for specific tests, or the one on top for "Run all".
+
 #### **Additional notes**
 
-- There is one limitation currently: playwright UI can work for about 10 minutes only, cause gotrue token will expire after.
+- The Playwright UI session is limited to 10 minutes only, as the gotrue token will expire after. When you get logged out, just close the UI and rer-run `npm run test:frontend:stage/prod`
 
 - To clean old browser context folders that conquered your workspace run:
 
