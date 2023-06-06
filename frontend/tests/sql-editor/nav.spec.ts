@@ -25,15 +25,6 @@ test('sql editor opens with welcome screen', async ({ page }) => {
   ).toBeTruthy()
 })
 
-// test('just select something', async ({ page }) => {
-//   await page.goto(editorUrl)
-
-//   // Expect a title "to contain" a substring.
-//   await expect(page).toHaveTitle(/SQL | Supabase/)
-
-//   await page.click(`a[href=""]`)
-// })
-
 test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await page.goto(editorUrl)
 
@@ -41,17 +32,9 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await expect(gettingStartedLoaded).toBeVisible()
 
   // wait for API calls to finish
-  //   const userContentResp = await page.waitForResponse((r) => {
-  //     return r.url().includes('/content') && r.request().method() === 'GET'
-  //   })
-  //   const userPermissionsResp = await page.waitForResponse((r) => {
-  //     return r.url().includes('/permissions') && r.request().method() === 'GET'
-  //   })
   const entityDefinitions = await page.waitForResponse((r) => {
     return r.url().includes('/query?key=entity-definitions') && r.request().method() === 'POST'
   })
-  //   await expect(userContentResp.ok()).toBeTruthy()
-  //   await expect(userPermissionsResp.ok()).toBeTruthy()
   expect(entityDefinitions.ok()).toBeTruthy()
 
   // create first snippet
@@ -63,17 +46,6 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await expect(createFirstSnippetResp.ok()).toBeTruthy()
 
   const snippetOneUrl = await page.url()
-  const snippetOne = page.url()
-  // console.log('first snippet', snippetOne)
-
-  // await page.goto(editorUrl)
-  // await page.goto(snippetOne)
-
-  // Expect a title "to contain" a substring.
-  //   await expect(page).toHaveTitle(/SQL | Supabase/)
-
-  //
-  //
 
   // Wait for Monaco Editor to be ready
   const monacoEditor = await page.locator('.monaco-editor').first()
@@ -146,8 +118,47 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await expect(page.getByText(/Nick/)).toBeVisible()
   await expect(page.getByText(/Jennifer/)).toBeVisible()
 
-  // await expect(page.getByText(/query should not be empty/)).toBeVisible()
+  /**
+   * delete first snippet
+   */
+  // click the snippet
+  await page.click(`a[href="${snippetOneUrl.replace(dashboardUrl, '')}"]`)
+  // context menu button now available to click
+  await page.click(`a[href="${snippetOneUrl.replace(dashboardUrl, '')}"] + div div button`)
+  // allow for UI transitions/animation of dropdown and modal
+  //   await page.waitForTimeout(150)
+  // Check dropdown appeared
+  await expect(page.getByText(/Delete query/)).toBeVisible()
+  await page.click('"Delete query"')
+  // allow for UI transitions/animation of dropdown and modal
+  //   await page.waitForTimeout(150)
+  // delete the snippet
+  await page.click('"Delete query"')
+  const deleteSnippetOneResp = await page.waitForResponse((r) => {
+    return r.url().includes('/content') && r.request().method() === 'DELETE'
+  })
+  expect(deleteSnippetOneResp.ok()).toBeTruthy()
 
-  // create first snippet
-  //   await await page.click('"run"')
+  await expect(page.getByText(/Confirm to delete/)).not.toBeVisible()
+
+  /**
+   * delete second snippet
+   */
+  // click the snippet
+  await page.click(`a[href="${snippetTwoUrl.replace(dashboardUrl, '')}"]`)
+  // context menu button now available to click
+  await page.click(`a[href="${snippetTwoUrl.replace(dashboardUrl, '')}"] + div div button`)
+  // allow for UI transitions/animation of dropdown and modal
+  //   await page.waitForTimeout(150)
+  // Check dropdown appeared
+  await expect(page.getByText(/Delete query/)).toBeVisible()
+  await page.click('"Delete query"')
+  // allow for UI transitions/animation of dropdown and modal
+  //   await page.waitForTimeout(150)
+  // delete the snippet
+  await page.click('"Delete query"')
+  const deleteSnippetTwoResp = await page.waitForResponse((r) => {
+    return r.url().includes('/content') && r.request().method() === 'DELETE'
+  })
+  expect(deleteSnippetTwoResp.ok()).toBeTruthy()
 })
