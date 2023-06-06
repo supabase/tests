@@ -1,6 +1,5 @@
 import { expect } from '@playwright/test'
 import { test } from '../../src/execution/persistent-ctx'
-import { setTimeout } from 'timers'
 
 const dashboardUrl = process.env.SUPA_DASHBOARD || 'https://app.supabase.com'
 const projectId = process.env.FE_TESTS_PROJECT_REF || 'aaaaaaaaaaaaaaaaaaaa'
