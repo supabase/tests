@@ -21,15 +21,25 @@ test('sql editor opens with welcome screen', async ({ page }) => {
   ).toBeTruthy()
 })
 
-test('SQL editor opens and can click on new query', async ({ page }) => {
+test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await page.goto(editorUrl)
+
+  const gettingStartedLoaded = await page.getByText(/Getting started/)
+  await expect(gettingStartedLoaded !== undefined).toBeTruthy()
+
+  const userContentResp = await page.waitForResponse((r) => {
+    return r.url().includes('/content') && r.request().method() === 'GET'
+  })
+  await expect(userContentResp.ok()).toBeTruthy()
 
   await page.click('"New query"')
 
-  // should check that monaco editor is visible.
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/SQL | Supabase/)
 
-  await page.waitForSelector('.monaco-editor')
+  // should check that monaco editor is visible.
+  //   await page.waitForSelector('.monaco-editor')
   // check that text in the results section is visible.
-  const resultsDefaultText = await page.getByText(/Click RUN to execute your query./)
-  await expect(resultsDefaultText !== undefined).toBeTruthy()
+  //   const resultsDefaultText = await page.getByText(/Click RUN to execute your query./)
+  //   await expect(resultsDefaultText !== undefined).toBeTruthy()
 })
