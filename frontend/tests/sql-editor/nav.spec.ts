@@ -5,6 +5,8 @@ const dashboardUrl = process.env.SUPA_DASHBOARD || 'https://app.supabase.com'
 const projectId = process.env.FE_TESTS_PROJECT_REF || 'aaaaaaaaaaaaaaaaaaaa'
 const editorUrl = `${dashboardUrl}/project/${projectId}/sql`
 
+const cmdKey = process.platform === 'darwin' ? 'Meta' : 'Control'
+
 test('sql editor opens with welcome screen', async ({ page }) => {
   await page.goto(editorUrl)
 
@@ -55,11 +57,6 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
 
   //
   //
-  // should check that monaco editor is visible.
-  //   await page.waitForSelector('.monaco-editor')
-  //   check that text in the results section is visible.
-  const resultsDefaultText = await page.getByText(/Click RUN to execute your query./)
-  await expect(resultsDefaultText !== undefined).toBeTruthy()
 
   // Wait for Monaco Editor to be ready
   await page.waitForSelector('.monaco-editor')
@@ -72,29 +69,16 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
     return
   }
 
-  const editorContent = await monacoEditor.$('div[role="code"]')
-
-  if (!editorContent) {
-    console.error('Editor content element not found')
-    return
-  }
+  // Click on the Monaco Editor
+  await monacoEditor.click()
 
   // Focus the Monaco Editor
-  await editorContent.focus()
+  //   await monacoEditor?.focus()
 
   // Emulate typing using low-level key events
-  await page.keyboard.press('Meta+A') // Select all existing text
+  await page.keyboard.press(`${cmdKey}+A`) // Select all existing text
   await page.keyboard.press('Backspace') // Delete the selected text
   await page.keyboard.type('Hello, Monaco Editor!') // Type the desired text
-  //
-  //
-  //
-  //
-  //
-  //
-
-  // Determine the appropriate key for CMD or Control
-  const cmdKey = process.platform === 'darwin' ? 'Meta' : 'Control'
 
   // Simulate CMD+Enter keyboard shortcut
   await page.keyboard.down(cmdKey)
