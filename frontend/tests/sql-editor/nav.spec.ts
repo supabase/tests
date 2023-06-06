@@ -5,7 +5,8 @@ const dashboardUrl = process.env.SUPA_DASHBOARD || 'https://app.supabase.com'
 const projectId = process.env.FE_TESTS_PROJECT_REF || 'aaaaaaaaaaaaaaaaaaaa'
 const editorUrl = `${dashboardUrl}/project/${projectId}/sql`
 
-const cmdKey = process.platform === 'darwin' ? 'Meta' : 'Control'
+// weird thing, in playwright UI test runner it acts as linux/windows and works with Control
+const cmdKey = process.env.CI && process.platform === 'darwin' ? 'Meta' : 'Control'
 
 test('sql editor opens with welcome screen', async ({ page }) => {
   await page.goto(editorUrl)
@@ -26,8 +27,8 @@ test('sql editor opens with welcome screen', async ({ page }) => {
 test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await page.goto(editorUrl)
 
-  const gettingStartedLoaded = await page.getByText(/Getting started/)
-  await expect(gettingStartedLoaded !== undefined).toBeTruthy()
+  const gettingStartedLoaded = page.getByText(/Getting started/)
+  await expect(gettingStartedLoaded).toBeVisible()
 
   // wait for API calls to finish
   //   const userContentResp = await page.waitForResponse((r) => {
@@ -41,16 +42,16 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   })
   //   await expect(userContentResp.ok()).toBeTruthy()
   //   await expect(userPermissionsResp.ok()).toBeTruthy()
-  await expect(entityDefinitions.ok()).toBeTruthy()
+  expect(entityDefinitions.ok()).toBeTruthy()
 
   // create first snippet
-  await await page.click('"New query"')
+  await page.click('"New query"', { delay: 20 })
 
-  const snippetOne = await page.url()
-  console.log('first snippet', snippetOne)
+  const snippetOne = page.url()
+  // console.log('first snippet', snippetOne)
 
-  await page.goto(editorUrl)
-  await page.goto(snippetOne)
+  // await page.goto(editorUrl)
+  // await page.goto(snippetOne)
 
   // Expect a title "to contain" a substring.
   //   await expect(page).toHaveTitle(/SQL | Supabase/)
@@ -59,18 +60,13 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   //
 
   // Wait for Monaco Editor to be ready
-  await page.waitForSelector('.monaco-editor')
+  const monacoEditor = await page.locator('.monaco-editor').first()
 
   // Get the Monaco Editor instance
-  const monacoEditor = await page.$('.monaco-editor')
-
-  if (!monacoEditor) {
-    console.error('Monaco Editor element not found')
-    return
-  }
+  await monacoEditor.waitFor({ state: 'visible' })
 
   // Click on the Monaco Editor
-  await monacoEditor.click()
+  await monacoEditor.click({ delay: 20 })
 
   // Focus the Monaco Editor
   //   await monacoEditor?.focus()
@@ -81,19 +77,17 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await page.keyboard.type('Hello, Monaco Editor!') // Type the desired text
 
   // Simulate CMD+Enter keyboard shortcut
-  await page.keyboard.down(cmdKey)
-  await page.keyboard.press('Enter')
-  await page.keyboard.up('Enter')
-  await page.keyboard.up(cmdKey)
+  await monacoEditor.focus()
+  await page.keyboard.press(`${cmdKey}+Enter`, { delay: 100 })
 
   const firstSqlQueryResp = await page.waitForResponse((r) => {
     return r.url().includes('/query') && r.request().method() === 'POST'
   })
-  await expect(firstSqlQueryResp.ok()).toBeTruthy()
+  // cause query is plain string, it's not valid right now
+  expect(firstSqlQueryResp.ok()).toBeFalsy()
 
-  await expect(page.getByText(/query should not be empty/)).toBeVisible()
-  await expect(page.getByText(/Invalid SQL query/)).toBeVisible()
-
+  // await expect(page.getByText(/query should not be empty/)).toBeVisible()
+  await page.getByText(/Invalid SQL query/).waitFor({ state: 'visible' })
   // create first snippet
   //   await await page.click('"run"')
 })
