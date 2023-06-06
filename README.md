@@ -41,6 +41,8 @@ This may not be the best practice, but it significantly increases tests speed, b
 
 Tests for supabase dashboard. Place for e2e and integration tests.
 
+---
+
 ## How to run
 
 To run locally you need to download .env file from bitwarden for environment you are going to use: either `staging` or `prod` and put it in `.env.staging` or `.env.prod` file.
@@ -66,6 +68,8 @@ cp .env integration/.env.prod
 ```
 
 Then go to the integration tests folder `cd integration` and run `npm run test:stage` or `npm run test:prod`.
+
+#### **Cleanup**
 
 Don't forget to delete project after you've done with it:
 
@@ -95,4 +99,12 @@ To run tests against vercel preview build just change the following env in `.env
 SUPA_DASHBOARD='https://supabase-studio-staging-...-supabase.vercel.app'
 ```
 
-There is one limitation currently: playwright UI can work for about 10 minutes only, cause gotrue token will expire after.
+#### **Additional notes**
+
+- There is one limitation currently: playwright UI can work for about 10 minutes only, cause gotrue token will expire after.
+
+- To clean old browser context folders that conquered your workspace run:
+
+  ```bash
+  npm run browserCtx:clean
+  ```

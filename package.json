@@ -8,7 +8,8 @@
     "project:create": "ts-node-esm ./src/scripts/create-project.ts",
     "project:delete": "ts-node-esm ./src/scripts/delete-project.ts",
     "test:frontend:stage": "NODE_ENV=staging playwright test -c ./frontend/playwright.config.ts --ui",
-    "test:frontend:prod": "NODE_ENV=prod playwright test -c ./frontend/playwright.config.ts --ui"
+    "test:frontend:prod": "NODE_ENV=prod playwright test -c ./frontend/playwright.config.ts --ui",
+    "browserCtx:clean": "find . -type d -name 'browserContext-*' -exec rm -rf {} +"
   },
   "author": "Supabase, Inc.",
   "license": "MIT",
