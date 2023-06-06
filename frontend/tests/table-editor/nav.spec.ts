@@ -81,7 +81,7 @@ test.describe.serial('table operations', () => {
 
     await page.click(`button:right-of(:text("${tableName}"))`)
     await page.click('"Delete Table"', { delay: 50 })
-    await page.click('"Delete"', { delay: 300 })
+    await page.click('"Delete"', { delay: 50 })
 
     const resp = await page.waitForResponse((r) => {
       return r.url().includes('tables?id=') && r.request().method() === 'DELETE'
