@@ -21,10 +21,10 @@ test('API docs are available on view', async ({ page }) => {
 
   // Expect an API button to not be visible after table is loaded
   await expect(page.getByRole('columnheader').first()).toBeVisible()
-  await expect(page.getByText('Definition')).toBeVisible()
+  await expect(page.getByText('API')).toBeVisible()
 
-  await page.click('"definition"')
-  await expect(page.getByText('SQL Definition of actor_info')).toBeVisible()
+  await page.click('"API"')
+  await expect(page.getByText('header').getByText('API')).toBeVisible()
 })
 
 test('open view definition', async ({ page }) => {
