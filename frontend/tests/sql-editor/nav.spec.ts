@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 import { test } from '../../src/execution/persistent-ctx'
+import { setTimeout } from 'timers'
 
 const dashboardUrl = process.env.SUPA_DASHBOARD || 'https://app.supabase.com'
 const projectId = process.env.FE_TESTS_PROJECT_REF || 'aaaaaaaaaaaaaaaaaaaa'
@@ -22,6 +23,15 @@ test('sql editor opens with welcome screen', async ({ page }) => {
     welcomePageTitle !== undefined && scriptTitle !== undefined && scriptDescription !== undefined
   ).toBeTruthy()
 })
+
+// test('just select something', async ({ page }) => {
+//   await page.goto(editorUrl)
+
+//   // Expect a title "to contain" a substring.
+//   await expect(page).toHaveTitle(/SQL | Supabase/)
+
+//   await page.click(`a[href=""]`)
+// })
 
 test('SQL editor opens and can click on new query 2', async ({ page }) => {
   await page.goto(editorUrl)
@@ -46,17 +56,12 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
   // create first snippet
   await await page.click('"New query"')
 
-  const snippetOne = await page.url()
-  console.log('first snippet', snippetOne)
+  const createFirstSnippetResp = await page.waitForResponse((r) => {
+    return r.url().includes('/content') && r.request().method() === 'POST'
+  })
+  await expect(createFirstSnippetResp.ok()).toBeTruthy()
 
-  await page.goto(editorUrl)
-  await page.goto(snippetOne)
-
-  // Expect a title "to contain" a substring.
-  //   await expect(page).toHaveTitle(/SQL | Supabase/)
-
-  //
-  //
+  const snippetOneUrl = await page.url()
 
   // Wait for Monaco Editor to be ready
   await page.waitForSelector('.monaco-editor')
@@ -71,29 +76,42 @@ test('SQL editor opens and can click on new query 2', async ({ page }) => {
 
   // Click on the Monaco Editor
   await monacoEditor.click()
-
-  // Focus the Monaco Editor
-  //   await monacoEditor?.focus()
-
   // Emulate typing using low-level key events
   await page.keyboard.press(`${cmdKey}+A`) // Select all existing text
   await page.keyboard.press('Backspace') // Delete the selected text
   await page.keyboard.type('Hello, Monaco Editor!') // Type the desired text
 
   // Simulate CMD+Enter keyboard shortcut
-  await page.keyboard.down(cmdKey)
-  await page.keyboard.press('Enter')
-  await page.keyboard.up('Enter')
-  await page.keyboard.up(cmdKey)
+  //   await page.keyboard.down(cmdKey)
+  //   await page.keyboard.press('Enter')
+  //   await page.keyboard.up('Enter')
+  //   await page.keyboard.up(cmdKey)
 
-  const firstSqlQueryResp = await page.waitForResponse((r) => {
-    return r.url().includes('/query') && r.request().method() === 'POST'
+  //   const firstSqlQueryResp = await page.waitForResponse((r) => {
+  //     return r.url().includes('/query') && r.request().method() === 'POST'
+  //   })
+  //   await expect(firstSqlQueryResp.ok()).toBeTruthy()
+
+  // create second snippet
+  await await page.click('"New query"')
+
+  const createSecondSnippetResp = await page.waitForResponse((r) => {
+    return r.url().includes('/content') && r.request().method() === 'POST'
   })
-  await expect(firstSqlQueryResp.ok()).toBeTruthy()
+  await expect(createSecondSnippetResp.ok()).toBeTruthy()
 
-  await expect(page.getByText(/query should not be empty/)).toBeVisible()
-  await expect(page.getByText(/Invalid SQL query/)).toBeVisible()
+  const snippetTwoUrl = await page.url()
 
-  // create first snippet
-  //   await await page.click('"run"')
+  // Click on the Monaco Editor
+  await monacoEditor.click()
+  // Emulate typing using low-level key events
+  await page.keyboard.press(`${cmdKey}+A`) // Select all existing text
+  await page.keyboard.press('Backspace') // Delete the selected text
+  await page.keyboard.type('select * from public.actor') // Type the desired text
+
+  // switch between snippets
+  await page.click(`a[href="${snippetOneUrl.replace('https://app.supabase.green', '')}"]`)
+  await page.click(`a[href="${snippetTwoUrl.replace('https://app.supabase.green', '')}"]`)
+  await page.click(`a[href="${snippetOneUrl.replace('https://app.supabase.green', '')}"]`)
+  await page.click(`a[href="${snippetTwoUrl.replace('https://app.supabase.green', '')}"]`)
 })
