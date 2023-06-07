@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test'
+import { Locator, Page, expect } from '@playwright/test'
 import { test } from '../../src/execution/persistent-ctx'
 
 const dashboardUrl = process.env.SUPA_DASHBOARD || 'https://app.supabase.com'
@@ -14,150 +14,132 @@ test('sql editor opens with welcome screen', async ({ page }) => {
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/SQL | Supabase/)
 
-  const welcomePageTitle = await page.getByText(/Quick scripts to run on your database./)
-  const scriptTitle = await page.getByText(/Create table./)
-  const scriptDescription = await page.getByText(
+  const welcomePageTitle = page.getByText(/Quick scripts to run on your database./)
+  const scriptTitle = page.getByText(/Create table./)
+  const scriptDescription = page.getByText(
     /Basic table template. Change "table_name" to the name you prefer./
   )
-  await expect(
-    welcomePageTitle !== undefined && scriptTitle !== undefined && scriptDescription !== undefined
-  ).toBeTruthy()
+
+  await Promise.all([
+    expect(welcomePageTitle).toBeVisible(),
+    expect(scriptTitle).toBeVisible(),
+    expect(scriptDescription).toBeVisible(),
+  ])
 })
 
 test('SQL editor opens and can click on new query 2', async ({ page }) => {
-  await page.goto(editorUrl)
+  // Arrange steps: go to SQL editor and create 2 query snippets
 
-  const gettingStartedLoaded = page.getByText(/Getting started/)
-  await expect(gettingStartedLoaded).toBeVisible()
+  let snippetOneUrl: string = ''
+  let snippetTwoUrl: string = ''
+  await test.step('Arrange', async () => {
+    await test.step('Go to SQL editor', async () => {
+      await page.goto(editorUrl)
+      // wait for API calls to finish
+      const entityDefinitions = await page.waitForResponse((r) => {
+        return r.url().includes('/query?key=entity-definitions') && r.request().method() === 'POST'
+      })
+      expect(entityDefinitions.ok()).toBeTruthy()
+    })
 
-  // wait for API calls to finish
-  const entityDefinitions = await page.waitForResponse((r) => {
-    return r.url().includes('/query?key=entity-definitions') && r.request().method() === 'POST'
+    await test.step('Create first snippet and run it', async () => {
+      snippetOneUrl = await createSnippetGUI(page)
+      await enterMonacoQueryGUI(page, 'select * from public.city')
+
+      const firstSqlQueryResp = await executeQueryGUI(page)
+      expect(firstSqlQueryResp.ok()).toBeTruthy()
+      await expect(page.getByText(/Abha/)).toBeVisible()
+      await expect(page.getByText(/Abu Dhabi/)).toBeVisible()
+      await expect(page.getByText(/Acua/)).toBeVisible()
+    })
+
+    await test.step('Create second snippet', async () => {
+      snippetTwoUrl = await createSnippetGUI(page)
+      await enterMonacoQueryGUI(page, 'select * from public.actor')
+    })
   })
-  expect(entityDefinitions.ok()).toBeTruthy()
 
-  // create first snippet
+  await test.step('Act: switch between snippets and execute the second query', async () => {
+    await test.step('Switch between snippets', async () => {
+      // todo: add snippet renames and search by name to not fail if there >20 snippets
+      await page.click(`a[href="${snippetOneUrl.replace(dashboardUrl, '')}"]`)
+      await page.click(`a[href="${snippetTwoUrl.replace(dashboardUrl, '')}"]`)
+      await page.click(`a[href="${snippetOneUrl.replace(dashboardUrl, '')}"]`)
+      await page.click(`a[href="${snippetTwoUrl.replace(dashboardUrl, '')}"]`)
+    })
+
+    await test.step('Run 2nd query snippet', async () => {
+      const secondSqlQueryResp = await executeQueryGUI(page)
+      expect(secondSqlQueryResp.ok()).toBeTruthy()
+      // check results are displaying
+      await expect(page.getByText(/Penelope/)).toBeVisible()
+      await expect(page.getByText(/Nick/)).toBeVisible()
+      await expect(page.getByText(/Jennifer/)).toBeVisible()
+    })
+  })
+
+  await test.step('Cleanup: delete snippets', async () => {
+    // todo: replace with API calls
+    await deleteSnippetGUI(page, snippetOneUrl)
+
+    // check that the modal is no longer visible so we can delete second snippet
+    await expect(page.getByText(/Confirm to delete/)).not.toBeVisible()
+
+    await deleteSnippetGUI(page, snippetTwoUrl)
+  })
+})
+
+async function executeQueryGUI(page: Page) {
+  // Get the Monaco Editor instance
+  const monacoEditor = page.locator('.monaco-editor').first()
+  await monacoEditor.waitFor({ state: 'visible' })
+  await monacoEditor.focus()
+  await monacoEditor.click({ delay: 20 })
+  await page.keyboard.press(`${cmdKey}+Enter`, { delay: 100 })
+
+  const sqlQueryResp = await page.waitForResponse((r) => {
+    return r.url().includes('/query') && r.request().method() === 'POST'
+  })
+  return sqlQueryResp
+}
+
+async function enterMonacoQueryGUI(page: Page, query: string = ''): Promise<Locator> {
+  // Wait for Monaco Editor to be ready
+  const monacoEditor = page.locator('.monaco-editor').first()
+  await monacoEditor.waitFor({ state: 'visible' })
+  await monacoEditor.click({ delay: 20 })
+
+  // Emulate typing using low-level key events
+  await page.keyboard.press(`${cmdKey}+A`) // Select all existing text
+  await page.keyboard.press('Backspace') // Delete the selected text
+  await page.keyboard.type(query) // Type the desired text
+  return monacoEditor
+}
+
+async function createSnippetGUI(page: Page): Promise<string> {
   await page.click('"New query"', { delay: 20 })
-
   const createFirstSnippetResp = await page.waitForResponse((r) => {
     return r.url().includes('/content') && r.request().method() === 'POST'
   })
-  await expect(createFirstSnippetResp.ok()).toBeTruthy()
+  expect(createFirstSnippetResp.ok()).toBeTruthy()
+  const snippetOneUrl = page.url()
+  return snippetOneUrl
+}
 
-  const snippetOneUrl = await page.url()
-
-  // Wait for Monaco Editor to be ready
-  const monacoEditor = await page.locator('.monaco-editor').first()
-
-  // Get the Monaco Editor instance
-  await monacoEditor.waitFor({ state: 'visible' })
-
-  // Click on the Monaco Editor
-  await monacoEditor.click({ delay: 20 })
-
-  // Focus the Monaco Editor
-  //   await monacoEditor?.focus()
-
-  // Emulate typing using low-level key events
-  await page.keyboard.press(`${cmdKey}+A`) // Select all existing text
-  await page.keyboard.press('Backspace') // Delete the selected text
-  await page.keyboard.type('select * from public.city') // Type the desired text
-
-  await monacoEditor.focus()
-  await page.keyboard.press(`${cmdKey}+Enter`, { delay: 100 })
-
-  const firstSqlQueryResp = await page.waitForResponse((r) => {
-    return r.url().includes('/query') && r.request().method() === 'POST'
-  })
-
-  expect(firstSqlQueryResp.ok()).toBeTruthy()
-  await expect(page.getByText(/Abha/)).toBeVisible()
-  await expect(page.getByText(/Abu Dhabi/)).toBeVisible()
-  await expect(page.getByText(/Acua/)).toBeVisible()
-
-  // create second snippet
-  await await page.click('"New query"')
-
-  const createSecondSnippetResp = await page.waitForResponse((r) => {
-    return r.url().includes('/content') && r.request().method() === 'POST'
-  })
-  await expect(createSecondSnippetResp.ok()).toBeTruthy()
-
-  const snippetTwoUrl = await page.url()
-
-  // Click on the Monaco Editor
-  await monacoEditor.click()
-  // Emulate typing using low-level key events
-  await page.keyboard.press(`${cmdKey}+A`) // Select all existing text
-  await page.keyboard.press('Backspace') // Delete the selected text
-  await page.keyboard.type('select * from public.actor') // Type the desired text
-
-  // switch between snippets
-  await page.click(`a[href="${snippetOneUrl.replace('https://app.supabase.green', '')}"]`)
-  await page.click(`a[href="${snippetTwoUrl.replace('https://app.supabase.green', '')}"]`)
-  await page.click(`a[href="${snippetOneUrl.replace('https://app.supabase.green', '')}"]`)
-  await page.click(`a[href="${snippetTwoUrl.replace('https://app.supabase.green', '')}"]`)
-
-  // run 2nd query
-  // Get the Monaco Editor instance
-  await monacoEditor.waitFor({ state: 'visible' })
-  await monacoEditor.click({ delay: 20 })
-  await monacoEditor.focus()
-  await page.keyboard.press(`${cmdKey}+Enter`, { delay: 100 })
-
-  const secondSqlQueryResp = await page.waitForResponse((r) => {
-    return r.url().includes('/query') && r.request().method() === 'POST'
-  })
-  //   await expect(secondSqlQueryResp.ok()).toBeTruthy()
-  // cause query is plain string, it's not valid right now
-  expect(secondSqlQueryResp.ok()).toBeTruthy()
-
-  // check results are displaying
-  await expect(page.getByText(/Penelope/)).toBeVisible()
-  await expect(page.getByText(/Nick/)).toBeVisible()
-  await expect(page.getByText(/Jennifer/)).toBeVisible()
-
-  /**
-   * delete first snippet
-   */
+async function deleteSnippetGUI(page: Page, snippetOneUrl: string) {
   // click the snippet
   await page.click(`a[href="${snippetOneUrl.replace(dashboardUrl, '')}"]`)
   // context menu button now available to click
   await page.click(`a[href="${snippetOneUrl.replace(dashboardUrl, '')}"] + div div button`)
-  // allow for UI transitions/animation of dropdown and modal
-  //   await page.waitForTimeout(150)
+
   // Check dropdown appeared
   await expect(page.getByText(/Delete query/)).toBeVisible()
   await page.click('"Delete query"')
-  // allow for UI transitions/animation of dropdown and modal
-  //   await page.waitForTimeout(150)
+
   // delete the snippet
   await page.click('"Delete query"')
-  const deleteSnippetOneResp = await page.waitForResponse((r) => {
+  const deleteSnippetResp = await page.waitForResponse((r) => {
     return r.url().includes('/content') && r.request().method() === 'DELETE'
   })
-  expect(deleteSnippetOneResp.ok()).toBeTruthy()
-
-  await expect(page.getByText(/Confirm to delete/)).not.toBeVisible()
-
-  /**
-   * delete second snippet
-   */
-  // click the snippet
-  await page.click(`a[href="${snippetTwoUrl.replace(dashboardUrl, '')}"]`)
-  // context menu button now available to click
-  await page.click(`a[href="${snippetTwoUrl.replace(dashboardUrl, '')}"] + div div button`)
-  // allow for UI transitions/animation of dropdown and modal
-  //   await page.waitForTimeout(150)
-  // Check dropdown appeared
-  await expect(page.getByText(/Delete query/)).toBeVisible()
-  await page.click('"Delete query"')
-  // allow for UI transitions/animation of dropdown and modal
-  //   await page.waitForTimeout(150)
-  // delete the snippet
-  await page.click('"Delete query"')
-  const deleteSnippetTwoResp = await page.waitForResponse((r) => {
-    return r.url().includes('/content') && r.request().method() === 'DELETE'
-  })
-  expect(deleteSnippetTwoResp.ok()).toBeTruthy()
-})
+  expect(deleteSnippetResp.ok()).toBeTruthy()
+}
