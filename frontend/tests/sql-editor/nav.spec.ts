@@ -27,12 +27,11 @@ test('sql editor opens with welcome screen', async ({ page }) => {
   ])
 })
 
-test('SQL editor opens and can click on new query 2', async ({ page }) => {
-  // Arrange steps: go to SQL editor and create 2 query snippets
-
+test('switch between 2 queries and verify the right one executed', async ({ page }) => {
   let snippetOneUrl: string = ''
   let snippetTwoUrl: string = ''
-  await test.step('Arrange', async () => {
+
+  await test.step('Arrange: create 2 snippets and execute the first one', async () => {
     await test.step('Go to SQL editor', async () => {
       await page.goto(editorUrl)
       // wait for API calls to finish
