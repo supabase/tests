@@ -27,7 +27,7 @@ class Settings extends Hooks {
   @test
   async 'get postgrest settings'() {
     const settingsResp = await crossFetch(
-      `${Settings.supaPlatformURI}/projects/${process.env.PROJECT_REF}/config?app=postgrest`,
+      `${Settings.supaPlatformURI}/projects/${process.env.PROJECT_REF}/config/postgrest`,
       {
         headers: Settings.headers,
       }

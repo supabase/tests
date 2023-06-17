@@ -16,11 +16,9 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   console.log('Pausing project...')
   const project = JSON.parse(fs.readFileSync(projectFile, 'utf8'))
 
-  if (!project.apiKey) {
-    const { apiKey } = await getAccessToken()
-    project.apiKey = apiKey
-  }
-  const apiKey = project.apiKey
+  const { apiKey } = await getAccessToken()
+  project.apiKey = apiKey
+
   console.log('API Key acquired')
 
   const headers = {
@@ -45,7 +43,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
 
   // wait for project to be paused
   console.log('Waiting for project to be paused...')
-  await waitForProjectStatus('INACTIVE', supaPlatformUri, project.ref, headers)
+  await waitForProjectStatus('INACTIVE', supaPlatformUri, project.ref, headers, 150)
   console.log('Project paused')
 
   console.log('Restoring project...')
