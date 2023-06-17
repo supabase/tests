@@ -168,7 +168,7 @@ class Forms extends Hooks {
   }
 
   private async searchTickets(): Promise<TicketsResponse> {
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 30; i++) {
       const ticketsResp = await crossFetch(
         'https://api.hubapi.com/crm/v3/objects/tickets/search',
         {

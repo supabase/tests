@@ -8,9 +8,10 @@ export async function waitForProjectStatus(
   expectedStatus: string,
   supaUri: string,
   ref: string,
-  headers: any
+  headers: any,
+  retries = 60
 ) {
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < retries; i++) {
     try {
       const statusResp = await crossFetch(`${supaUri}/projects/${ref}/status`, {
         headers: headers,
