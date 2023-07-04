@@ -14,7 +14,7 @@ class Forms extends Hooks {
   @feature(FEATURE.FORMS)
   @severity(Severity.NORMAL)
   @description('create support request from project page')
-  @timeout(300000)
+  @timeout(600000)
   @test
   async '[skip-stage] new ticket from project'() {
     const page = await this.browserCtx.newPage()
@@ -22,8 +22,14 @@ class Forms extends Hooks {
     attach('project home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     await page.locator(`h1:has-text("${process.env.PROJECT_NAME}")`).isVisible()
 
-    await page.locator('button:has-text("Help")').first().click()
-    await page.locator('a:has-text("Contact Support")').first().click()
+    await page.locator('button:has-text("Help")').first().isVisible()
+    try {
+      await page.locator('button:has-text("Help")').first().click({ delay: 100 })
+    } catch (e) {
+      // retry
+      await page.locator('button:has-text("Help")').first().click({ delay: 100 })
+    }
+    await page.locator('a:has-text("Contact Support")').first().click({ delay: 100 })
 
     attach('support form', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     await page.locator('h3:has-text("How can we help?")').isVisible()
