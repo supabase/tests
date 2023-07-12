@@ -41,8 +41,8 @@ jobs:
           GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
           GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
           GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
-          PROJECT_REF: 'ujepherbynksodbkwomx'
-          PROJECT_NAME: 'verifytests'
+          PROJECT_REF: 'dgkrksgaqkkgxjkhjygq'
+          PROJECT_NAME: 'rectangular-keystone'
           PROJECT_DB_PASS: ${{ secrets.VERIFICATION_STAGE_PROJECT_DB_PASS }}
           SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
           SUPA_META_URI: 'https://api.supabase.green/platform/pg-meta'
