@@ -46,7 +46,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     },
     15000
   )
-  assert(createResp.status == 201)
+  assert(createResp.status == 201, createResp.statusText)
   const project = await createResp.json()
   const ref = project.ref
 

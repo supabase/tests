@@ -39,10 +39,6 @@ export const defaultTables = [
 
 export const defaultSchemas = [
   {
-    name: 'public',
-    owner: 'postgres',
-  },
-  {
     name: 'extensions',
     owner: 'postgres',
   },
