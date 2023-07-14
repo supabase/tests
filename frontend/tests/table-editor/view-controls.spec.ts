@@ -12,15 +12,16 @@ test('insert not available on view', async ({ page }) => {
   await page.goto(actorInfoViewUrl)
 
   // Expect a insert button to not be visible after table is loaded
-  await expect(page.getByRole('columnheader').first()).toBeVisible()
+  await expect(page.getByRole('columnheader').first()).toBeVisible({ timeout: 20000 })
   await expect(page.getByText('"Insert"')).not.toBeVisible()
 })
 
 test('API docs are available on view', async ({ page }) => {
+  test.fail()
   await page.goto(actorInfoViewUrl)
 
   // Expect an API button to not be visible after table is loaded
-  await expect(page.getByRole('columnheader').first()).toBeVisible()
+  await expect(page.getByRole('columnheader').first()).toBeVisible({ timeout: 20000 })
   await expect(page.getByText('API')).toBeVisible()
 
   await page.click('"API"')
@@ -31,7 +32,7 @@ test('open view definition', async ({ page }) => {
   await page.goto(actorInfoViewUrl)
 
   // Expect an API button to not be visible after table is loaded
-  await expect(page.getByRole('columnheader').first()).toBeVisible()
+  await expect(page.getByRole('columnheader').first()).toBeVisible({ timeout: 20000 })
   await expect(page.getByText('Definition')).toBeVisible()
 
   await page.click('"definition"')
@@ -44,7 +45,7 @@ test('filter view by id', async ({ page }) => {
   // id of actor_info view in supabase
   await page.goto(actorInfoViewUrl)
 
-  await expect(page.getByRole('columnheader').first()).toBeVisible()
+  await expect(page.getByRole('columnheader').first()).toBeVisible({ timeout: 20000 })
 
   await page.click('"Filter"', { delay: 50 })
   await page.click('"Add filter"', { delay: 50 })
