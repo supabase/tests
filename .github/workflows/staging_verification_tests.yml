@@ -153,7 +153,7 @@ jobs:
           PROJECT_JSON: 'project.json'
 
   frontend:
-    name: Freontend Tests
+    name: Frontend Tests
     runs-on: ubuntu-20.04
     timeout-minutes: 15
 
