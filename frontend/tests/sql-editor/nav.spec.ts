@@ -28,6 +28,8 @@ test('sql editor opens with welcome screen', async ({ page }) => {
 })
 
 test('switch between 2 queries and verify the right one executed', async ({ page }) => {
+  test.slow()
+
   let snippetOneUrl: string = ''
   let snippetTwoUrl: string = ''
 

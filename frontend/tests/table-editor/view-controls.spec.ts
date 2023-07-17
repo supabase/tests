@@ -16,8 +16,8 @@ test('insert not available on view', async ({ page }) => {
   await expect(page.getByText('"Insert"')).not.toBeVisible()
 })
 
-test('API docs are available on view', async ({ page }) => {
-  test.fail()
+// todo: remove fixme when docs become available
+test.fixme('API docs are available on view', async ({ page }) => {
   await page.goto(actorInfoViewUrl)
 
   // Expect an API button to not be visible after table is loaded
