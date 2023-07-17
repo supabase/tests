@@ -23,7 +23,7 @@
     "allure-js-commons": "^2.0.0-beta.14",
     "cross-fetch": "^3.1.5",
     "dotenv": "^16.0.0",
-    "eslint": "^8.7.0",
+    "eslint": "^8.45.0",
     "jest": "^27.4.7",
     "jest-allure2-adapter": "^0.3.11",
     "otpauth": "^7.1.2",
