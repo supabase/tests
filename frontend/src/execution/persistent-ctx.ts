@@ -3,6 +3,9 @@ import fs from 'fs'
 import { test as base } from '@playwright/test'
 import { BrowserContext, chromium, Page } from 'playwright'
 
+let beingCopied = false
+let lastUpdated = Date.now()
+
 export const test = base.extend<
   {
     page: Page
@@ -20,11 +23,31 @@ export const test = base.extend<
         throw new Error('CONTEXT_DIR env variable is not set')
       }
       // copy the directory contextDir to temp userDataDir for worker
+      if (beingCopied) {
+        while (beingCopied) {
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+      }
       fs.cpSync(contextDir, userDataDir, { recursive: true })
 
       const context = await chromium.launchPersistentContext(userDataDir)
 
       await use(context)
+      context.close()
+      console.log(lastUpdated)
+      if (!beingCopied && Date.now() - lastUpdated > 1000 * 60 * 5) {
+        try {
+          beingCopied = true
+          lastUpdated = Date.now()
+          console.log('updating context')
+          fs.rmSync(contextDir, { recursive: true, force: true })
+          fs.cpSync(userDataDir, contextDir, { recursive: true, force: true })
+        } catch (e) {
+          console.error(e)
+        } finally {
+          beingCopied = false
+        }
+      }
     },
     { scope: 'test' },
   ],
