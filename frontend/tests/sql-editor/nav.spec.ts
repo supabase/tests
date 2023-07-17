@@ -119,6 +119,8 @@ async function enterMonacoQueryGUI(page: Page, query: string = ''): Promise<Loca
 
 async function createSnippetGUI(page: Page): Promise<string> {
   await page.click('"New query"', { delay: 20 })
+
+  await page.click('"New blank query"', { delay: 20 })
   const createFirstSnippetResp = await page.waitForResponse((r) => {
     return r.url().includes('/content') && r.request().method() === 'POST'
   })
