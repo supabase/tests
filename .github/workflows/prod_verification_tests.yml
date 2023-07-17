@@ -187,7 +187,7 @@ jobs:
           FE_TESTS_PROJECT_REF: 'bwhmrdxxwjfmrelopnji'
           FE_TESTS_PROJECT_NAME: 'frontend-tests'
           FE_TESTS_PROJECT_DB_PASS: ${{ secrets.VERIFICATION_PROD_FE_TESTS_PROJECT_DB_PASS }}
-          FE_TESTS_ACTOR_INFO_VIEW_ID: '28630'
+          FE_TESTS_ACTOR_INFO_VIEW_ID: '29313'
           SUPA_PLATFORM_URI: 'https://api.supabase.io/platform'
           SUPA_META_URI: 'https://api.supabase.io/platform/pg-meta'
           SUPA_PROJECT_DOMAIN: 'supabase.co'
