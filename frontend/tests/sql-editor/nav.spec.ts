@@ -28,6 +28,8 @@ test('sql editor opens with welcome screen', async ({ page }) => {
 })
 
 test('switch between 2 queries and verify the right one executed', async ({ page }) => {
+  test.slow()
+
   let snippetOneUrl: string = ''
   let snippetTwoUrl: string = ''
 
@@ -36,7 +38,7 @@ test('switch between 2 queries and verify the right one executed', async ({ page
       await page.goto(editorUrl)
       // wait for API calls to finish
       const entityDefinitions = await page.waitForResponse((r) => {
-        return r.url().includes('/query?key=entity-definitions') && r.request().method() === 'POST'
+        return r.url().includes('/query?key=project-read-only') && r.request().method() === 'POST'
       })
       expect(entityDefinitions.ok()).toBeTruthy()
     })
@@ -117,6 +119,8 @@ async function enterMonacoQueryGUI(page: Page, query: string = ''): Promise<Loca
 
 async function createSnippetGUI(page: Page): Promise<string> {
   await page.click('"New query"', { delay: 20 })
+
+  await page.click('"New blank query"', { delay: 20 })
   const createFirstSnippetResp = await page.waitForResponse((r) => {
     return r.url().includes('/content') && r.request().method() === 'POST'
   })

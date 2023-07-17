@@ -152,6 +152,53 @@ jobs:
           SUPA_DASHBOARD: 'https://app.supabase.green'
           PROJECT_JSON: 'project.json'
 
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run frontend tests
+        run: npm run test:frontend:ci:stage
+        env:
+          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
+          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
+          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
+          FE_TESTS_PROJECT_REF: 'hwmqcqbzihriioxfvgvr'
+          FE_TESTS_PROJECT_NAME: 'frontend-tests'
+          FE_TESTS_PROJECT_DB_PASS: ${{ secrets.VERIFICATION_STAGE_FE_TESTS_PROJECT_DB_PASS }}
+          FE_TESTS_ACTOR_INFO_VIEW_ID: '28654'
+          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
+          SUPA_META_URI: 'https://api.supabase.green/platform/pg-meta'
+          SUPA_PROJECT_DOMAIN: 'supabase.red'
+          SUPA_DASHBOARD: 'https://app.supabase.green'
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: playwright-report-frontend-stage
+          path: frontend/playwright-report/
+          retention-days: 7
+
   report:
     name: Upload report
     if: ${{ always() }}
