@@ -38,7 +38,7 @@ test('switch between 2 queries and verify the right one executed', async ({ page
       await page.goto(editorUrl)
       // wait for API calls to finish
       const entityDefinitions = await page.waitForResponse((r) => {
-        return r.url().includes('/query?key=entity-definitions') && r.request().method() === 'POST'
+        return r.url().includes('/query?key=project-read-only') && r.request().method() === 'POST'
       })
       expect(entityDefinitions.ok()).toBeTruthy()
     })
