@@ -34,7 +34,6 @@ export const test = base.extend<
 
       await use(context)
       context.close()
-      console.log(lastUpdated)
       if (!beingCopied && Date.now() - lastUpdated > 1000 * 60 * 5) {
         try {
           beingCopied = true
