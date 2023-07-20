@@ -101,7 +101,7 @@ CONTEXT_DIR=${contextDir}
         MAILER_OTP_EXP: 86400,
         PASSWORD_MIN_LENGTH: 6,
         // phone login enable, confirm is disabled
-        EXTERNAL_PHONE_ENABLED: true,
+        EXTERNAL_PHONE_ENABLED: false,
         SMS_PROVIDER: 'twilio',
         SMS_TWILIO_ACCOUNT_SID: ' ',
         SMS_TWILIO_AUTH_TOKEN: ' ',

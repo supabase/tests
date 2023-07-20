@@ -101,7 +101,7 @@ class Authentication extends Hooks {
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.BLOCKER)
   @description('When user sign up with phone then he should be logged in')
-  @test
+  @test.skip
   async 'create new users by phone auth'() {
     // sign up user
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
