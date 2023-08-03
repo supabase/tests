@@ -17,12 +17,11 @@ class Project extends Hooks {
   @test
   async 'create project'() {
     const page = await this.browserCtx.newPage()
-    await page.goto(process.env.SUPA_DASHBOARD)
+    await page.goto(`${process.env.SUPA_DASHBOARD}/org/${process.env.SUPA_ORG_SLUG}`)
 
     attach('home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     await page.locator('button:has-text("New project")').first().click()
     attach('create project', await page.screenshot({ fullPage: true }), ContentType.JPEG)
-    await page.locator('[role="menuitem"] >> text=verification').click()
 
     const name = faker.word.noun()
     const pass = faker.internet.password()
