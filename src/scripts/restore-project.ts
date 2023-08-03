@@ -66,7 +66,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   await waitForProjectStatus('ACTIVE_HEALTHY', supaPlatformUri, project.ref, headers)
 
   // wait for storage to be ready for project
-  // console.log('Waiting for storage to be healthy...')
-  // await waitForStorageReady(project.endpoint, project.service_key)
+  console.log('Waiting for storage to be healthy...')
+  await waitForStorageReady(project.endpoint, project.service_key)
   console.log('Project is running again')
 })()
