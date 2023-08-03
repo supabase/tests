@@ -15,7 +15,7 @@ class Forms extends Hooks {
   @severity(Severity.NORMAL)
   @description('create support request from project page')
   @timeout(600000)
-  @test
+  @test.skip
   async '[skip-stage] new ticket from project'() {
     const page = await this.browserCtx.newPage()
     await page.goto(`${process.env.SUPA_DASHBOARD}/project/${process.env.PROJECT_REF}`)

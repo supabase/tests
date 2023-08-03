@@ -43,6 +43,7 @@ jobs:
           GITHUB_PASS: ${{ secrets.VERIFICATION_PROD_GITHUB_PASS }}
           PROJECT_REF: 'nhspkocxnkjvbphkoepx'
           PROJECT_NAME: 'verifytests'
+          SUPA_ORG_SLUG: 'squealing-ivory-qshl8px'
           PROJECT_DB_PASS: ${{ secrets.VERIFICATION_PROD_PROJECT_DB_PASS }}
           SUPA_PLATFORM_URI: 'https://api.supabase.io/platform'
           SUPA_META_URI: 'https://api.supabase.io/platform/pg-meta'
