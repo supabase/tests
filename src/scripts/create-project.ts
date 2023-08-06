@@ -119,7 +119,7 @@ CONTEXT_DIR=${contextDir}
   }
 
   // wait for storage to be ready for project
-  // await waitForStorageReady(project.endpoint, project.service_key)
+  await waitForStorageReady(project.endpoint, project.service_key)
 })()
 
 async function authenticate() {
