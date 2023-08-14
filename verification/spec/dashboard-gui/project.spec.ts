@@ -31,7 +31,7 @@ class Project extends Hooks {
     await page.click('button:has-text("Create new project")')
 
     await page.waitForSelector(`h1:has-text("${name}")`)
-    await page.waitForSelector(`"Setting up project"`)
+    await page.waitForSelector(`"Initiating project set up"`)
     attach('project setting up', await page.screenshot({ fullPage: true }), ContentType.JPEG)
 
     const pageURLParts = page.url().split('/')
