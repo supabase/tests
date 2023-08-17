@@ -253,7 +253,7 @@ jobs:
   alert:
     name: Alert slack if tests failed
     if: ${{ failure() }}
-    needs: [verification, integration, report]
+    needs: [integration]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
