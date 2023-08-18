@@ -19,11 +19,14 @@ class Triggers extends Hooks {
     const { supabase, user } = await this.createSignedInSupaClient()
 
     // insert profile to trigger profile_insert trigger
-    const {
-      data: [profileInserted],
-      error: errorInsert,
-    } = await this.insertProfile(supabase, user, user)
+    const { data: profilesInserted, error: errorInsert } = await this.insertProfile(
+      supabase,
+      user,
+      user
+    )
     expect(errorInsert).toBeNull()
+    expect(profilesInserted).toHaveLength(1)
+    const profileInserted = profilesInserted[0]
     expect(profileInserted.username).toMatch(user.username)
 
     // check that profile_insert trigger has been executed

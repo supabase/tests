@@ -80,7 +80,7 @@ jobs:
           GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
           SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
           SUPA_DASHBOARD: 'https://app.supabase.green'
-          SUPA_ORG_ID: '166'
+          SUPA_ORG_ID: '468'
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
         run: |
