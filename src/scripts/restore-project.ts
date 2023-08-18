@@ -35,6 +35,9 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     },
     15000
   )
+  if (pauseResp.status != 201) {
+    console.log(await pauseResp.text())
+  }
   assert(
     pauseResp.status == 201,
     `Failed to pause project ${pauseResp.status}: ${pauseResp.statusText}`
