@@ -126,11 +126,15 @@ const getAccessToken = async () => {
   }
 
   // check access token works
-  const res = await crossFetch(`${supaPlatformUri}/projects`, {
-    headers: {
-      Authorization: `Bearer ${token.access_token}`,
+  const res = await crossFetch(
+    `${supaPlatformUri}/projects`,
+    {
+      headers: {
+        Authorization: `Bearer ${token.access_token}`,
+      },
     },
-  })
+    15000
+  )
   assert(res.ok === true)
   return {
     apiKey: token.access_token,
