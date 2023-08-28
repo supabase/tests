@@ -115,6 +115,8 @@ CONTEXT_DIR=${contextDir}
     15000
   )
   if (patchResp.status != 200) {
+    console.log(patchResp.status, patchResp.statusText)
+    console.log(await patchResp.text())
     console.log('could not patch auth config')
   }
 

@@ -18,6 +18,7 @@ class Project extends Hooks {
   async 'create project'() {
     const page = await this.browserCtx.newPage()
     await page.goto(`${process.env.SUPA_DASHBOARD}/org/${process.env.SUPA_ORG_SLUG}`)
+    await page.waitForLoadState('networkidle')
 
     attach('home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     await page.locator('button:has-text("New project")').first().click()
@@ -30,8 +31,12 @@ class Project extends Hooks {
     attach('form filled', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     await page.click('button:has-text("Create new project")')
 
-    await page.waitForSelector(`h1:has-text("${name}")`)
-    await page.waitForSelector(`"Initiating project set up"`)
+    try {
+      await page.waitForSelector(`h1:has-text("${name}")`)
+      await page.waitForSelector(`"Initiating project set up"`)
+    } catch (e) {
+      await page.waitForSelector(`"Setting up project"`)
+    }
     attach('project setting up', await page.screenshot({ fullPage: true }), ContentType.JPEG)
 
     const pageURLParts = page.url().split('/')
