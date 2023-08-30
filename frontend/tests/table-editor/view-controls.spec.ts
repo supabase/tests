@@ -53,7 +53,12 @@ test('filter view by id', async ({ page }) => {
   await page.click('"Apply filter"', { delay: 50 })
   await page.click('.sb-grid')
 
-  const resp = await page.waitForResponse(/query\?key=public-actor_info/)
+  const resp = await page.waitForResponse((response) => {
+    return (
+      response.url().includes('query?key=public-actor_info') &&
+      (response.request().postData()?.includes('= 4') ?? false)
+    )
+  })
   expect(resp.ok()).toBe(true)
   await expect(page.getByText('Loading records count...')).not.toBeVisible()
 
