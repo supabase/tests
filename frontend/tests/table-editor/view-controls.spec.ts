@@ -62,7 +62,12 @@ test('filter view by id', async ({ page }) => {
   expect(resp.ok()).toBe(true)
   await expect(page.getByText('Loading records count...')).not.toBeVisible()
 
-  const filteredRows = await page.$$('.rdg-row')
+  let filteredRows = await page.$$('.rdg-row')
+  if (filteredRows.length != 1) {
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(1000)
+    filteredRows = await page.$$('.rdg-row')
+  }
   expect(filteredRows.length).toBe(1)
   const filteredIds = await filteredRows[0].$$eval('.rdg-cell', (cells) => cells[1].textContent)
   expect(filteredIds).toBe('4')
