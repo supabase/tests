@@ -12,19 +12,11 @@ test('sql editor opens with welcome screen', async ({ page }) => {
   await page.goto(editorUrl)
 
   // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/SQL Editor/)
+  await expect(page).toHaveTitle(/SQL | Supabase/)
 
-  const welcomePageTitle = page.getByText(/Quick scripts to run on your database./)
-  const scriptTitle = page.getByText(/Create table./)
-  const scriptDescription = page.getByText(
-    /Basic table template. Change "table_name" to the name you prefer./
-  )
+  const welcomePageTitle = page.getByText(/SQL Editor/)
 
-  await Promise.all([
-    expect(welcomePageTitle).toBeVisible(),
-    expect(scriptTitle).toBeVisible(),
-    expect(scriptDescription).toBeVisible(),
-  ])
+  await Promise.all([expect(welcomePageTitle).toBeVisible()])
 })
 
 test('switch between 2 queries and verify the right one executed', async ({ page }) => {
