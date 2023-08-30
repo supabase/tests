@@ -15,19 +15,20 @@ class Forms extends Hooks {
   @severity(Severity.NORMAL)
   @description('create support request from project page')
   @timeout(600000)
-  @test.skip
+  @test
   async '[skip-stage] new ticket from project'() {
     const page = await this.browserCtx.newPage()
     await page.goto(`${process.env.SUPA_DASHBOARD}/project/${process.env.PROJECT_REF}`)
     attach('project home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
+    await page.waitForLoadState('networkidle')
     await page.locator(`h1:has-text("${process.env.PROJECT_NAME}")`).isVisible()
 
-    await page.locator('button:has-text("Help")').first().isVisible()
+    await page.locator('#help-popover-button').first().isVisible()
     try {
-      await page.locator('button:has-text("Help")').first().click({ delay: 100 })
+      await page.locator('#help-popover-button').first().click({ delay: 100 })
     } catch (e) {
       // retry
-      await page.locator('button:has-text("Help")').first().click({ delay: 100 })
+      await page.locator('#help-popover-button').first().click({ delay: 100 })
     }
     await page.locator('a:has-text("Contact Support")').first().click({ delay: 100 })
 
@@ -39,11 +40,10 @@ class Forms extends Hooks {
     await page.fill('input[id="subject"]', 'From verification test')
     await page.click('button[id="category"]', { delay: 100 })
     await page.click('div[role="menuitem"]:has-text("Database unresponsive")', { delay: 100 })
-    await page.hover('button:has-text("No particular service")', { timeout: 1000 })
+    await page.hover('div:has-text("No particular service")', { timeout: 1000 })
     await page.waitForTimeout(200)
-    await page.click('button:has-text("No particular service")', { delay: 100 })
-    await page.waitForTimeout(200)
-    await page.click('p:has-text("Edge Functions")', { delay: 100 })
+    await page.getByText('No particular service').locator('..').click({ delay: 100 })
+    // await page.click('div:has-text("No particular service")', { delay: 100 })
     await page.waitForTimeout(200)
     await page.click('p:has-text("Authentication")', { delay: 100 })
     await page.waitForTimeout(200)
@@ -152,7 +152,6 @@ class Forms extends Hooks {
     expect(data.subject).toBe('From verification test')
     expect(data.message).toBe(message)
     expect(data.category).toBe('Database_unresponsive')
-    expect(data.affectedServices).toContain('edge_functions')
     expect(data.affectedServices).toContain('authentication')
     expect(data.projectRef).toBe(process.env.PROJECT_REF)
     expect(data.severity).toBe('Low')
@@ -161,7 +160,6 @@ class Forms extends Hooks {
     expect(ticket.properties.subject).toBe('From verification test')
     expect(ticket.properties.content).toBe(message)
     expect(ticket.properties.type).toBe('database_unresponsive')
-    expect(ticket.properties.affected_services).toContain('edge_functions')
     expect(ticket.properties.affected_services).toContain('authentication')
     expect(ticket.properties.project_reference).toBe(process.env.PROJECT_REF)
     expect(ticket.properties.severity).toBe('low')

@@ -12,7 +12,7 @@ test('sql editor opens with welcome screen', async ({ page }) => {
   await page.goto(editorUrl)
 
   // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/SQL | Supabase/)
+  await expect(page).toHaveTitle(/SQL Editor/)
 
   const welcomePageTitle = page.getByText(/Quick scripts to run on your database./)
   const scriptTitle = page.getByText(/Create table./)
