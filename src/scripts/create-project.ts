@@ -125,12 +125,20 @@ CONTEXT_DIR=${contextDir}
 })()
 
 async function authenticate() {
+  for (let i = 0; i < 5; i++) {
+    const { apiKey, contextDir } = await tryAuthenticate()
+    if (apiKey) return { apiKey, contextDir }
+  }
+  console.log('could not authenticate')
+  throw new Error('could not authenticate')
+}
+
+async function tryAuthenticate() {
   try {
     const { apiKey, contextDir } = await getAccessToken()
     return { apiKey, contextDir }
   } catch (e) {
     console.log(e)
-    const { apiKey, contextDir } = await getAccessToken()
-    return { apiKey, contextDir }
+    return { apiKey: '', contextDir: '' }
   }
 }
