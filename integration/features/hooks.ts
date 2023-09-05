@@ -34,13 +34,13 @@ export abstract class Hooks {
     },
   })
 
-  @step('terminate sql connection')
   static async after(done: any): Promise<any> {
     try {
       await Hooks.sql.end({ timeout: 1000 })
       return Promise.resolve(null).then(done)
     } catch (err) {
-      return Promise.reject(err).then(done)
+      console.log('failed to close sql conn', err)
+      return Promise.resolve(null).then(done)
     }
   }
 
