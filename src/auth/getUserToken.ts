@@ -9,9 +9,22 @@ import assert from 'assert'
 // a bit too complicated to do auth with github via API, so we do authorization with GUI
 const getAccessToken = async () => {
   if (process.env.ACCESS_TOKEN && process.env.CONTEXT_DIR) {
-    return {
-      apiKey: process.env.GITHUB_TOKEN,
-      contextDir: process.env.CONTEXT_DIR,
+    const res = await crossFetch(
+      `${process.env.SUPA_PLATFORM_URI}/projects`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+        },
+      },
+      15000
+    )
+    if (res.ok === true) {
+      return {
+        apiKey: process.env.ACCESS_TOKEN,
+        contextDir: process.env.CONTEXT_DIR,
+      }
+    } else {
+      console.log('ACCESS_TOKEN is invalid', res.status, res.statusText)
     }
   }
 
@@ -142,4 +155,23 @@ const getAccessToken = async () => {
   }
 }
 
-export { getAccessToken }
+async function authenticate(retries = 5) {
+  for (let i = 0; i < retries; i++) {
+    const { apiKey, contextDir } = await tryAuthenticate()
+    if (apiKey) return { apiKey, contextDir }
+  }
+  console.log('could not authenticate')
+  throw new Error('could not authenticate')
+}
+
+async function tryAuthenticate() {
+  try {
+    const { apiKey, contextDir } = await getAccessToken()
+    return { apiKey, contextDir }
+  } catch (e) {
+    console.log(e)
+    return { apiKey: '', contextDir: '' }
+  }
+}
+
+export { getAccessToken, authenticate }

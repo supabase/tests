@@ -3,7 +3,7 @@ import fs from 'fs'
 import dotenv from 'dotenv'
 
 import crossFetch from '../common/timeoutFetch'
-import { getAccessToken } from '../auth/getUserToken'
+import { authenticate } from '../auth/getUserToken'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
@@ -15,7 +15,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   const project = JSON.parse(fs.readFileSync(projectFile, 'utf8'))
 
   if (!project.apiKey) {
-    const { apiKey } = await getAccessToken()
+    const { apiKey } = await authenticate()
     project.apiKey = apiKey
   }
   let apiKey = project.apiKey
@@ -37,7 +37,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   // if token expired, refresh token and try again
   if (deleteResp.status == 401) {
     // refresh token
-    const { apiKey } = await getAccessToken()
+    const { apiKey } = await authenticate()
     project.apiKey = apiKey
   }
   apiKey = project.apiKey

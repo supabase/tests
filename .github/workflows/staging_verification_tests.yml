@@ -12,6 +12,14 @@ on:
 concurrency:
   group: ${{ github.workflow }}
 
+env:
+  GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
+  GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
+  GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
+  SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
+  SUPA_META_URI: 'https://api.supabase.green/platform/pg-meta'
+  SUPA_DASHBOARD: 'https://app.supabase.green'
+
 jobs:
   verification:
     name: Verification Tests
@@ -41,17 +49,11 @@ jobs:
       - name: Run verification tests
         run: npm run test:stage
         env:
-          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
-          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
-          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
           PROJECT_REF: 'dgkrksgaqkkgxjkhjygq'
           PROJECT_NAME: 'rectangular-keystone'
           SUPA_ORG_SLUG: 'special-purple-xfpfx2y'
           PROJECT_DB_PASS: ${{ secrets.VERIFICATION_STAGE_PROJECT_DB_PASS }}
-          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
-          SUPA_META_URI: 'https://api.supabase.green/platform/pg-meta'
           SUPA_PROJECT_DOMAIN: 'supabase.red'
-          SUPA_DASHBOARD: 'https://app.supabase.green'
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
@@ -80,11 +82,6 @@ jobs:
 
       - name: Create project
         env:
-          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
-          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
-          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
-          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
-          SUPA_DASHBOARD: 'https://app.supabase.green'
           SUPA_ORG_ID: '468'
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
@@ -116,11 +113,6 @@ jobs:
       - name: Pause and restore project
         run: npm run project:restore
         env:
-          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
-          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
-          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
-          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
-          SUPA_DASHBOARD: 'https://app.supabase.green'
           PROJECT_JSON: 'project.json'
 
       - name: Run restore tests
@@ -149,11 +141,6 @@ jobs:
         run: npm run project:delete
         if: ${{ always() }}
         env:
-          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
-          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
-          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
-          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
-          SUPA_DASHBOARD: 'https://app.supabase.green'
           PROJECT_JSON: 'project.json'
 
   frontend:
@@ -184,17 +171,11 @@ jobs:
       - name: Run frontend tests
         run: npm run test:frontend:ci:stage
         env:
-          GITHUB_TOTP: ${{ secrets.VERIFICATION_STAGE_GITHUB_TOTP }}
-          GITHUB_USER: ${{ secrets.VERIFICATION_STAGE_GITHUB_USER }}
-          GITHUB_PASS: ${{ secrets.VERIFICATION_STAGE_GITHUB_PASS }}
           FE_TESTS_PROJECT_REF: 'hwmqcqbzihriioxfvgvr'
           FE_TESTS_PROJECT_NAME: 'frontend-tests'
           FE_TESTS_PROJECT_DB_PASS: ${{ secrets.VERIFICATION_STAGE_FE_TESTS_PROJECT_DB_PASS }}
           FE_TESTS_ACTOR_INFO_VIEW_ID: '28654'
-          SUPA_PLATFORM_URI: 'https://api.supabase.green/platform'
-          SUPA_META_URI: 'https://api.supabase.green/platform/pg-meta'
           SUPA_PROJECT_DOMAIN: 'supabase.red'
-          SUPA_DASHBOARD: 'https://app.supabase.green'
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
