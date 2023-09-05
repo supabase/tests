@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import { faker } from '@faker-js/faker'
 
 import crossFetch from '../common/timeoutFetch'
-import { getAccessToken } from '../auth/getUserToken'
+import { authenticate } from '../auth/getUserToken'
 import { waitForProjectStatus, waitForStorageReady } from '../common/helpers'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
@@ -123,22 +123,3 @@ CONTEXT_DIR=${contextDir}
   // wait for storage to be ready for project
   await waitForStorageReady(project.endpoint, project.service_key)
 })()
-
-async function authenticate() {
-  for (let i = 0; i < 5; i++) {
-    const { apiKey, contextDir } = await tryAuthenticate()
-    if (apiKey) return { apiKey, contextDir }
-  }
-  console.log('could not authenticate')
-  throw new Error('could not authenticate')
-}
-
-async function tryAuthenticate() {
-  try {
-    const { apiKey, contextDir } = await getAccessToken()
-    return { apiKey, contextDir }
-  } catch (e) {
-    console.log(e)
-    return { apiKey: '', contextDir: '' }
-  }
-}

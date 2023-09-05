@@ -3,7 +3,7 @@ import fs from 'fs'
 import dotenv from 'dotenv'
 
 import crossFetch from '../common/timeoutFetch'
-import { getAccessToken } from '../auth/getUserToken'
+import { authenticate } from '../auth/getUserToken'
 import { waitForProjectStatus, waitForStorageReady } from '../common/helpers'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
@@ -16,7 +16,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
   console.log('Pausing project...')
   const project = JSON.parse(fs.readFileSync(projectFile, 'utf8'))
 
-  const { apiKey } = await getAccessToken()
+  const { apiKey } = await authenticate()
   project.apiKey = apiKey
 
   console.log('API Key acquired')
