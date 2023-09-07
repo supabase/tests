@@ -61,7 +61,7 @@ class Forms extends Hooks {
 
     await page.locator('h3:has-text("Support request successfully sent!")').isVisible()
     attach('request was submitted', await page.screenshot({ fullPage: true }), ContentType.JPEG)
-    await page.click('button:has-text("Go back to dashboard")')
+    await page.click('button:has-text("Go back")')
 
     await page.locator('button:has-text("New project")').first().isVisible()
 
