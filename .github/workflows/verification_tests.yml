@@ -61,6 +61,9 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-20.04
     timeout-minutes: 20
+    env:
+      SUPA_PLATFORM_URI: 'https://api.supabase.green/v0'
+      SUPA_V0_KEY: ${{ secrets.VERIFICATION_STAGE_V0_KEY }}
 
     steps:
       - name: Checkout Repo
@@ -81,7 +84,7 @@ jobs:
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
         run: |
-          npm run project:create
+          npm run project:create:v0
           cp .env.migrate integration/.env.staging
           cp .env.migrate restore/.env.staging
           npm run project:migrate
@@ -106,7 +109,7 @@ jobs:
         working-directory: restore
 
       - name: Pause and restore project
-        run: npm run project:restore
+        run: npm run project:restore:v0
         env:
           PROJECT_JSON: 'project.json'
 
@@ -133,7 +136,7 @@ jobs:
           retention-days: 1
 
       - name: Remove project
-        run: npm run project:delete
+        run: npm run project:delete:v0
         if: ${{ always() }}
         env:
           PROJECT_JSON: 'project.json'
