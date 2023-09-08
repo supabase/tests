@@ -134,7 +134,8 @@ export class Prep {
       await this.sql.end({ timeout: 1000 })
       return Promise.resolve(null)
     } catch (err) {
-      return Promise.reject(err)
+      console.log(err)
+      return Promise.resolve(null)
     }
   }
 }

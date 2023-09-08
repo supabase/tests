@@ -6,7 +6,7 @@ const config: Config.InitialOptions = {
     '^.+\\.ts?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'cjs', 'json', 'node'],
-  globalSetup: '<rootDir>/.jest/token.ts',
+  globalSetup: '<rootDir>/.jest/jest-env.ts',
   setupFilesAfterEnv: ['<rootDir>/.jest/jest-custom-reporter.ts'],
   testRunner: 'jest-jasmine2',
   testTimeout: 30000,
