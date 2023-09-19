@@ -1,6 +1,6 @@
 import { suite, test, timeout } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
-import crossFetch from '../../../src/common/timeoutFetch'
+import crossFetch from '../../../src/common/retriedFetch'
 import { ContentType, Severity } from 'allure-js-commons'
 
 import { attach, description, feature, log, severity, step } from '../../.jest/jest-custom-reporter'

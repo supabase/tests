@@ -1,5 +1,5 @@
 import { suite, test } from '@testdeck/jest'
-import crossFetch from '../../../src/common/timeoutFetch'
+import crossFetch from '../../../src/common/retriedFetch'
 import { ContentType, Severity } from 'allure-js-commons'
 
 import { attach, description, feature, log, severity, step } from '../../.jest/jest-custom-reporter'

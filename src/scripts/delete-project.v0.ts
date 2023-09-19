@@ -2,7 +2,7 @@ import assert from 'assert'
 import fs from 'fs'
 import dotenv from 'dotenv'
 
-import crossFetch from '../common/timeoutFetch'
+import crossFetch from '../common/retriedFetch'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 

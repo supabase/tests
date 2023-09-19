@@ -2,7 +2,7 @@ import assert from 'assert'
 
 import { createClient } from '@supabase/supabase-js'
 
-import crossFetch from '../common/timeoutFetch'
+import crossFetch from '../common/retriedFetch'
 
 export async function waitForProjectStatus(
   expectedStatus: string,

@@ -1,6 +1,6 @@
 import { suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
-import crossFetch from '../../../src/common/timeoutFetch'
+import crossFetch from '../../../src/common/retriedFetch'
 import { Severity } from 'allure-js-commons'
 
 import { createClient } from '@supabase/supabase-js'
