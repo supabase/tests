@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import crossFetch from '../common/timeoutFetch'
+import crossFetch from '../common/retriedFetch'
 import { chromium } from 'playwright'
 import * as OTPAuth from 'otpauth'
 

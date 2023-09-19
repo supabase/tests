@@ -1,4 +1,4 @@
-import crossFetch from '../../../src/common/timeoutFetch'
+import crossFetch from '../../../src/common/retriedFetch'
 import { faker } from '@faker-js/faker'
 
 import {

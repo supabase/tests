@@ -2,7 +2,7 @@ import assert from 'assert'
 import fs from 'fs'
 import dotenv from 'dotenv'
 
-import crossFetch from '../common/timeoutFetch'
+import crossFetch from '../common/retriedFetch'
 import { authenticate } from '../auth/getUserToken'
 import { waitForProjectStatus, waitForStorageReady } from '../common/helpers'
 
