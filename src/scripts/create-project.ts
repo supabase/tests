@@ -41,7 +41,6 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
         db_pass: dbPass,
         db_region: supaRegion,
         db_pricing_tier_id: 'tier_free',
-        kps_enabled: false,
       }),
     },
     15000
