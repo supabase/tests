@@ -23,6 +23,10 @@ class Forms extends Hooks {
     await page.waitForLoadState('networkidle')
     await page.locator(`h1:has-text("${process.env.PROJECT_NAME}")`).isVisible()
 
+    if (await page.locator('button:has-text("Accept")').first().isVisible()) {
+      await page.locator('button:has-text("Accept")').first().click({ delay: 100 })
+    }
+
     await page.locator('#help-popover-button').first().isVisible()
     try {
       await page.locator('#help-popover-button').first().click({ delay: 100 })

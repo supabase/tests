@@ -20,6 +20,10 @@ class Project extends Hooks {
     await page.goto(`${process.env.SUPA_DASHBOARD}/org/${process.env.SUPA_ORG_SLUG}`)
     await page.waitForLoadState('networkidle')
 
+    if (await page.locator('button:has-text("Accept")').first().isVisible()) {
+      await page.locator('button:has-text("Accept")').first().click({ delay: 100 })
+    }
+
     attach('home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     await page.locator('button:has-text("New project")').first().click()
     attach('create project', await page.screenshot({ fullPage: true }), ContentType.JPEG)
