@@ -197,7 +197,12 @@ class Forms extends Hooks {
                 ],
               },
             ],
-            sorts: ['createdAt'],
+            sorts: [
+              {
+                propertyName: 'createdate',
+                direction: 'DESCENDING',
+              },
+            ],
             properties: [
               'email',
               'affected_services',

@@ -28,5 +28,6 @@ export interface Ticket {
     ticket_priority: string
     type: string
     verified: string
+    is_product_feedback: string
   }
 }
