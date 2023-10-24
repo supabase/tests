@@ -18,6 +18,7 @@ const orgID = parseInt(supaOrgID)
 const supaRegion = process.env.SUPA_REGION || 'Southeast Asia (Singapore)'
 const outputFile = process.env.OUTPUT_FILE || '.env'
 const projectFile = process.env.PROJECT_JSON || 'project.json'
+const sleepSecs = parseInt(process.env.SLEEP_SECS || '75')
 
 ;(async () => {
   const headers = {
@@ -41,7 +42,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
         db_pricing_tier_id: 'tier_free',
       }),
     },
-    15000
+    60000
   )
   if (createResp.status != 201) {
     console.log('could not create project')
@@ -59,7 +60,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
     {
       headers: headers,
     },
-    10000
+    30000
   )
   assert(statusResp.status == 200)
   const { status } = await statusResp.json()
@@ -116,5 +117,5 @@ ACCESS_TOKEN=${apiKey}
   }
 
   // wait for storage to be ready for project
-  await waitForStorageReady(project.endpoint, project.service_key)
+  await waitForStorageReady(project.endpoint, project.service_key, sleepSecs)
 })()

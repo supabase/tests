@@ -66,7 +66,7 @@ jobs:
   integration:
     name: Integration Tests
     runs-on: ubuntu-20.04
-    timeout-minutes: 25
+    timeout-minutes: 55
     env:
       SUPA_PLATFORM_URI: 'https://api.supabase.io/v0'
       SUPA_V0_KEY: ${{ secrets.VERIFICATION_PROD_V0_KEY }}
@@ -89,6 +89,7 @@ jobs:
           SUPA_ORG_ID: '105764'
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
+          SLEEP_SECS: '150'
         run: |
           npm run project:create:v0
           cp .env.migrate integration/.env.prod
@@ -118,6 +119,7 @@ jobs:
         run: npm run project:restore:v0
         env:
           PROJECT_JSON: 'project.json'
+          SUPA_PAUSE_TIMEOUT: '1800'
 
       - name: Run restore tests
         run: npm run test:prod
