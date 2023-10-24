@@ -33,8 +33,8 @@ export async function waitForProjectStatus(
   }
 }
 
-export async function waitForStorageReady(endpoint: string, serviceKey: string) {
-  await new Promise((resolve) => setTimeout(resolve, 75 * 1000))
+export async function waitForStorageReady(endpoint: string, serviceKey: string, sleepSecs = 75) {
+  await new Promise((resolve) => setTimeout(resolve, sleepSecs * 1000))
   let successfulStorageCalls = 0
   for (let i = 0; i < 30; i++) {
     try {

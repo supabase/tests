@@ -11,6 +11,8 @@ const supaPlatformUri = process.env.SUPA_PLATFORM_URI
 assert(supaPlatformUri, 'SUPA_PLATFORM_URI is not set')
 const apiKey = process.env.SUPA_V0_KEY
 assert(apiKey, 'SUPA_V0_KEY is not set')
+const pauseTimeout = process.env.SUPA_PAUSE_TIMEOUT || '450'
+const retries = parseInt(pauseTimeout) / 3
 
 const projectFile = process.env.PROJECT_JSON || 'project.json'
 ;(async () => {
@@ -31,7 +33,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
       method: 'POST',
       headers: headers,
     },
-    15000
+    60000
   )
   if (pauseResp.status != 201) {
     console.log(await pauseResp.text())
@@ -44,7 +46,7 @@ const projectFile = process.env.PROJECT_JSON || 'project.json'
 
   // wait for project to be paused
   console.log('Waiting for project to be paused...')
-  await waitForProjectStatus('INACTIVE', supaPlatformUri, project.ref, headers, 150)
+  await waitForProjectStatus('INACTIVE', supaPlatformUri, project.ref, headers, retries)
   console.log('Project paused')
 
   console.log('Restoring project...')
