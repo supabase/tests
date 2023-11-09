@@ -25,7 +25,7 @@ class Project extends Hooks {
     }
 
     attach('home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
-    await page.locator('button:has-text("New project")').first().click()
+    await page.click('"New project"', { strict: false, delay: 100 })
     attach('create project', await page.screenshot({ fullPage: true }), ContentType.JPEG)
 
     const name = faker.word.noun()

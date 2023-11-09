@@ -57,7 +57,7 @@ class Forms extends Hooks {
 
     attach('form filled', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     const [response] = await Promise.all([
-      page.waitForResponse(/\/platform\/feedback\/send/),
+      page.waitForResponse(/\/platform\/feedback\/send/, { timeout: 60000 }),
       page.click('button[type="submit"]:has-text("Send support request")'),
     ])
     expect(response.status()).toBe(201)

@@ -19,7 +19,7 @@ export abstract class Hooks {
   async before(): Promise<any> {
     this.contextDir = fs.mkdtempSync('supabase--browser-context-')
     fs.cpSync(process.env.CONTEXT_DIR, this.contextDir, { recursive: true })
-    this.browserCtx = await chromium.launchPersistentContext(this.contextDir, { headless: true })
+    this.browserCtx = await chromium.launchPersistentContext(this.contextDir, { headless: false })
   }
 
   async after(): Promise<any> {
