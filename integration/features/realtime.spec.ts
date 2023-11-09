@@ -120,7 +120,7 @@ class Realtime extends Hooks {
     // wait for 1 second to see if we receive any events
     log('waiting for event (should not receive any)')
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel._isClosed).toBeTruthy()
+    expect(channel.state).toBe('closed')
     log('removing channel')
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')
@@ -272,7 +272,7 @@ class Realtime extends Hooks {
     // wait for 1 second to see if we receive any events
     log('waiting for 1 second to see if we receive any events')
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel._isClosed).toBeTruthy()
+    expect(channel.state).toBe('closed')
     log('removing channels')
     await supabase.removeChannel(channel)
   }
@@ -305,7 +305,7 @@ class Realtime extends Hooks {
     // wait for 1 second to see if we receive any events
     log('waiting for 1 second to see if we receive any events')
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel._isClosed).toBeTruthy()
+    expect(channel.state).toBe('closed')
   }
 
   @feature(FEATURE.REALTIME)
@@ -336,19 +336,19 @@ class Realtime extends Hooks {
     // wait for 1 second to see if we receive any events
     log('waiting for 1 second to see if we receive any events')
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel._isClosed).toBeTruthy()
+    expect(channel.state).toBe('closed')
   }
 
   @step('Wait until channel is joined')
   async waitForChannelJoined(channel: RealtimeChannel): Promise<Error> {
     for (let i = 0; i < 30; i++) {
-      if (channel._isJoined()) {
+      if (channel.state === 'joined') {
         return null
       }
-      if (channel._isLeaving()) {
+      if (channel.state === 'leaving') {
         return new Error('Channel is leaving')
       }
-      if (channel._isClosed()) {
+      if (channel.state === 'closed') {
         return new Error('Channel is closed')
       }
       await new Promise((resolve) => setTimeout(resolve, 100))

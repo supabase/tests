@@ -236,7 +236,7 @@ class Authentication extends Hooks {
     // update user
     const updParams = {
       email: faker.internet.email(),
-      password: faker.internet.password(),
+      password: faker.internet.password() + '_new',
       phone: faker.phone.phoneNumber('!#!##!######'),
     }
     const {
@@ -327,7 +327,7 @@ class Authentication extends Hooks {
     // update user
     const updParams = {
       email: faker.internet.email(),
-      password: faker.internet.password(),
+      password: faker.internet.password() + '_new',
       phone: faker.phone.phoneNumber('!#!##!######'),
     }
     const { error: updUserError } = await this.updateUser(supabase, updParams)
