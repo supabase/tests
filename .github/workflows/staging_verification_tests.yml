@@ -43,6 +43,9 @@ jobs:
         run: npm ci
         working-directory: .
 
+      - name: Create results folder
+        run: mkdir -p allure-results
+
       - name: Install dependencies
         run: npm ci
 
@@ -99,6 +102,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: integration
+
+      - name: Create results folders
+        run: |
+          mkdir -p integration/allure-results
+          mkdir -p restore/allure-results
 
       - name: Run integration tests
         run: npm run test:stage

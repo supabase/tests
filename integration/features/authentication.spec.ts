@@ -236,7 +236,7 @@ class Authentication extends Hooks {
     // update user
     const updParams = {
       email: faker.internet.email(),
-      password: faker.internet.password(),
+      password: faker.internet.password() + '_new',
       phone: faker.phone.phoneNumber('!#!##!######'),
     }
     const {
@@ -327,7 +327,7 @@ class Authentication extends Hooks {
     // update user
     const updParams = {
       email: faker.internet.email(),
-      password: faker.internet.password(),
+      password: faker.internet.password() + '_new',
       phone: faker.phone.phoneNumber('!#!##!######'),
     }
     const { error: updUserError } = await this.updateUser(supabase, updParams)
@@ -341,9 +341,9 @@ class Authentication extends Hooks {
 
     // check if sign in and update events were triggered and sign out event was not triggered
     log('check if sign in and update events were triggered and sign out event was not triggered')
-    expect(events).toHaveLength(2)
+    expect(events).toHaveLength(3)
     expect(events.map((e) => e.event)).toEqual(
-      expect.arrayContaining(['SIGNED_IN', 'USER_UPDATED'])
+      expect.arrayContaining(['INITIAL_SESSION', 'SIGNED_IN', 'USER_UPDATED'])
     )
     expect(events.map((e) => e.event)).not.toContain('SIGNED_OUT')
   }

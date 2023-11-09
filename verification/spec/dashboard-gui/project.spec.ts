@@ -18,14 +18,14 @@ class Project extends Hooks {
   async 'create project'() {
     const page = await this.browserCtx.newPage()
     await page.goto(`${process.env.SUPA_DASHBOARD}/org/${process.env.SUPA_ORG_SLUG}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load', { timeout: 60000 })
 
     if (await page.locator('button:has-text("Accept")').first().isVisible()) {
       await page.locator('button:has-text("Accept")').first().click({ delay: 100 })
     }
 
     attach('home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
-    await page.locator('button:has-text("New project")').first().click()
+    await page.click('"New project"', { strict: false, delay: 100 })
     attach('create project', await page.screenshot({ fullPage: true }), ContentType.JPEG)
 
     const name = faker.word.noun()
