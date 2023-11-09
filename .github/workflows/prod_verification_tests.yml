@@ -176,7 +176,7 @@ jobs:
           PROJECT_JSON: 'project.json'
 
       - name: Alert slack if tests failed but not if project was not paused
-        if: ${{ failure() }} && steps.pause.outcome != 'failure'
+        if: failure() && steps.pause.outcome != 'failure'
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
