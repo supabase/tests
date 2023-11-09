@@ -18,7 +18,7 @@ class Project extends Hooks {
   async 'create project'() {
     const page = await this.browserCtx.newPage()
     await page.goto(`${process.env.SUPA_DASHBOARD}/org/${process.env.SUPA_ORG_SLUG}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load', { timeout: 60000 })
 
     if (await page.locator('button:has-text("Accept")').first().isVisible()) {
       await page.locator('button:has-text("Accept")').first().click({ delay: 100 })

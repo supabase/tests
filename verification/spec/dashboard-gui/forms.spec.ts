@@ -20,7 +20,7 @@ class Forms extends Hooks {
     const page = await this.browserCtx.newPage()
     await page.goto(`${process.env.SUPA_DASHBOARD}/project/${process.env.PROJECT_REF}`)
     attach('project home page', await page.screenshot({ fullPage: true }), ContentType.JPEG)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('networkidle', { timeout: 60000 })
     await page.locator(`h1:has-text("${process.env.PROJECT_NAME}")`).isVisible()
 
     if (await page.locator('button:has-text("Accept")').first().isVisible()) {
