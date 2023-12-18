@@ -10,7 +10,7 @@ jobs:
     name: Run Issues Sync
     strategy:
       matrix:
-        node: ['14']
+        node: ['18']
 
     runs-on: ubuntu-latest
     defaults:

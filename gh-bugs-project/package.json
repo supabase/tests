@@ -8,7 +8,7 @@
     "sync": "node index.js"
   },
   "dependencies": {
-    "@octokit/graphql": "^4.8.0",
+    "@octokit/graphql": "^7.0.2",
     "octokit": "^3.1.2"
   }
 }

@@ -86,14 +86,14 @@ for (let i = 0; i <= ids.length / sendBatch; i++) {
   try {
     await Promise.all(promises)
   } catch (e) {
-    console.log(e.request.query)
-    console.log(JSON.stringify(e.response.errors))
+    console.log(e.request?.query)
+    console.log(JSON.stringify(e.response?.errors))
     console.log('retrying')
     const res = await gql({
-      query: e.request.query,
+      query: e.request?.query,
     })
-    console.log(JSON.stringify(res.response.errors))
-    errors.push(JSON.stringify(res.response.errors))
+    console.log(JSON.stringify(res.response?.errors))
+    errors.push(JSON.stringify(res.response?.errors))
   }
   await new Promise((resolve) => setTimeout(resolve, 100))
 }
