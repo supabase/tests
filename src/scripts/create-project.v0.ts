@@ -15,7 +15,7 @@ assert(apiKey, 'SUPA_V0_KEY is not set')
 const supaOrgID = process.env.SUPA_ORG_ID
 assert(supaOrgID, 'SUPA_ORG_ID is not set')
 const orgID = parseInt(supaOrgID)
-const supaRegion = process.env.SUPA_REGION || 'Southeast Asia (Singapore)'
+const supaRegion = process.env.SUPA_REGION || 'Singapore'
 const outputFile = process.env.OUTPUT_FILE || '.env'
 const projectFile = process.env.PROJECT_JSON || 'project.json'
 const sleepSecs = parseInt(process.env.SLEEP_SECS || '75')
@@ -34,7 +34,7 @@ const sleepSecs = parseInt(process.env.SLEEP_SECS || '75')
       method: 'POST',
       headers: headers,
       body: JSON.stringify({
-        cloud_provider: 'AWS',
+        cloud_provider: 'flyio',
         org_id: orgID,
         name: faker.internet.domainWord(),
         db_pass: dbPass,
