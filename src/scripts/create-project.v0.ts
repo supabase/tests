@@ -34,7 +34,7 @@ const sleepSecs = parseInt(process.env.SLEEP_SECS || '75')
       method: 'POST',
       headers: headers,
       body: JSON.stringify({
-        cloud_provider: 'fly',
+        cloud_provider: 'FLY',
         org_id: orgID,
         name: faker.internet.domainWord(),
         db_pass: dbPass,
