@@ -17,11 +17,13 @@ class Triggers extends Hooks {
     const { supabase, user } = await this.createSignedInSupaClient()
 
     // insert profile to trigger profile_insert trigger
-    const {
-      data: [profileInserted],
-      error: errorInsert,
-    } = await this.insertProfile(supabase, user, user)
+    const { data: profilesInserted, error: errorInsert } = await this.insertProfile(
+      supabase,
+      user,
+      user
+    )
     expect(errorInsert).toBeNull()
+    const profileInserted = profilesInserted.pop()
     expect(profileInserted.username).toMatch(user.username)
 
     // check if there are rows with duplicate username in profile_insert table

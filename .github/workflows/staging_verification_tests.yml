@@ -89,7 +89,7 @@ jobs:
 
       - name: Create project
         env:
-          SUPA_ORG_ID: '468'
+          SUPA_ORG_ID: '618'
           OUTPUT_FILE: '.env.migrate'
           PROJECT_JSON: 'project.json'
         run: |
