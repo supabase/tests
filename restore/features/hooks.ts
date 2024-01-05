@@ -15,7 +15,7 @@ export abstract class Hooks {
     host: process.env.SUPABASE_DB_HOST,
     port: parseInt(process.env.SUPABASE_DB_PORT),
     database: 'postgres',
-    username: 'postgres',
+    username: process.env.SUPABASE_DB_USER || 'postgres',
     password: process.env.SUPABASE_DB_PASS,
     types: {
       bytea: {
