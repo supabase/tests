@@ -55,6 +55,10 @@ class Forms extends Hooks {
     const message = faker.lorem.paragraph()
     await page.fill('textarea[id="message"]', message)
 
+    if (await page.locator('button:has-text("Accept")').first().isVisible()) {
+      await page.locator('button:has-text("Accept")').first().click({ delay: 100 })
+    }
+
     attach('form filled', await page.screenshot({ fullPage: true }), ContentType.JPEG)
     const [response] = await Promise.all([
       page.waitForResponse(/\/platform\/feedback\/send/, { timeout: 60000 }),
