@@ -73,7 +73,7 @@ const sleepSecs = parseInt(process.env.SLEEP_SECS || '75')
   fs.writeFileSync(
     outputFile,
     `SUPABASE_DB_HOST=aws-0-ap-southeast-1.pooler.supabase.${
-      process.env.NODE_ENV == 'staging' ? 'green' : 'com'
+      process.env.SUPA_PLATFORM_URI?.includes('green') ? 'green' : 'com'
     }
 SUPABASE_DB_PORT=6543
 SUPABASE_DB_USER=postgres.${ref}
