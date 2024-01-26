@@ -18,6 +18,7 @@ assert(dbPass, 'SUPABASE_DB_PASS is not set')
 const migrations = process.env.MIGRATIONS_FILE
 assert(migrations, 'MIGRATIONS_FILE is not set')
 ;(async () => {
+  console.log(`connection string postgres://${dbUser}:{password}@${dbHost}:${dbPort}/${dbName}`)
   const sql = postgres({
     host: dbHost,
     port: parseInt(dbPort),
@@ -27,15 +28,16 @@ assert(migrations, 'MIGRATIONS_FILE is not set')
   })
 
   const startTime = Date.now()
-  const maxTime = 3 * 60 * 1000 // 3 minutes
+  const maxTime = 10 * 60 * 1000 // 3 minutes
 
   // cause pooler may not be ready yet for the project
   while (Date.now() - startTime < maxTime) {
     try {
       await sql.file(migrations).execute()
+      console.log('migrations applied successfully')
       break
     } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+      await new Promise((resolve) => setTimeout(resolve, 5000))
     }
   }
 
