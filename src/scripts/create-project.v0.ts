@@ -72,8 +72,11 @@ const sleepSecs = parseInt(process.env.SLEEP_SECS || '75')
   fs.writeFileSync(projectFile, JSON.stringify(project, null, 2))
   fs.writeFileSync(
     outputFile,
-    `SUPABASE_DB_HOST=${project.endpoint.replace('https://', 'db.')}
-SUPABASE_DB_PORT=5432
+    `SUPABASE_DB_HOST=aws-0-ap-southeast-1.pooler.supabase.${
+      process.env.NODE_ENV == 'staging' ? 'green' : 'com'
+    }
+SUPABASE_DB_PORT=6543
+SUPABASE_DB_USER=postgres.${ref}
 SUPABASE_DB_PASS=${dbPass}
 SUPABASE_GOTRUE=${project.endpoint}/auth/v1
 SUPABASE_URL=${project.endpoint}
