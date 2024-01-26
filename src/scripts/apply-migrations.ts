@@ -26,9 +26,18 @@ assert(migrations, 'MIGRATIONS_FILE is not set')
     password: dbPass,
   })
 
-  try {
-    await sql.file(migrations).execute()
-  } finally {
-    await sql.end({ timeout: 1000 })
+  const startTime = Date.now()
+  const maxTime = 3 * 60 * 1000 // 3 minutes
+
+  // cause pooler may not be ready yet for the project
+  while (Date.now() - startTime < maxTime) {
+    try {
+      await sql.file(migrations).execute()
+      break
+    } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+    }
   }
+
+  await sql.end({ timeout: 1000 })
 })()
