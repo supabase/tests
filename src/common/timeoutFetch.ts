@@ -6,5 +6,10 @@ export default async function fetch(
   init?: RequestInit,
   timeout: number = 10000
 ): Promise<Response> {
-  return timeoutPromise(crossFetch(input, init), timeout)
+  const abort = new AbortController()
+  if (init) init.signal = abort.signal
+  if (init?.method === 'POST' && timeout === 10000) {
+    timeout = 15000
+  }
+  return timeoutPromise(crossFetch(input, init), timeout, abort)
 }
