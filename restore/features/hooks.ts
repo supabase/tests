@@ -30,6 +30,24 @@ export abstract class Hooks {
     },
   })
 
+  static async getSQLConnection(): Promise<any> {
+    const startTime = Date.now()
+    const maxTime = 10 * 60 * 1000 // 3 minutes
+
+    // cause pooler may not be ready yet for the project
+    while (Date.now() - startTime < maxTime) {
+      try {
+        await Hooks.sql`
+          select 1
+        `
+        break
+      } catch (error) {
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+      }
+    }
+    return Hooks.sql
+  }
+
   @step('terminate sql connection')
   static async after(done: any): Promise<any> {
     try {
