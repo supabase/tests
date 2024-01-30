@@ -5,7 +5,11 @@ export default async function timeoutRequest<T>(
 ): Promise<T> {
   let timer: NodeJS.Timeout
 
-  request.finally(() => clearTimeout(timer))
+  request
+    .catch((err) => {
+      console.error(`request error: ${err.message}`)
+    })
+    .finally(() => clearTimeout(timer))
 
   const timeoutPromise = new Promise<T>((_, reject) => {
     timer = setTimeout(() => {
