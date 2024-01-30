@@ -9,7 +9,14 @@ export default async function timeoutRequest<T>(
 
   const timeoutPromise = new Promise<T>((_, reject) => {
     timer = setTimeout(() => {
-      if (abort) abort.abort()
+      if (abort) {
+        try {
+          abort.abort()
+        } catch (e) {
+          console.log('Abort error', e, 'params', { timeout })
+          // ignore
+        }
+      }
       reject(new Error(`Timeout (${timeout}) for task exceeded`))
     }, timeout)
   })
