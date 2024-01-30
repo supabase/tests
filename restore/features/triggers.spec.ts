@@ -29,8 +29,9 @@ class Triggers extends Hooks {
     // check if there are rows with duplicate username in profile_insert table
     log('Check if there are rows with duplicate username in profile_insert table')
     console.log('asdasdasd')
+    const sql = await Hooks.getSQLConnection()
     const duplicates =
-      await Hooks.sql`SELECT username, COUNT(*) FROM profile_inserts GROUP BY username HAVING COUNT(*) > 1`
+      await sql`SELECT username, COUNT(*) FROM profile_inserts GROUP BY username HAVING COUNT(*) > 1`
     console.log('asdasdasd asd')
     expect(duplicates.count).toBe(0)
   }
@@ -47,7 +48,8 @@ class Triggers extends Hooks {
     const rawKey = fs.readFileSync('temp/test_key', { encoding: 'utf-8' })
 
     log('Check if key is matching the reference value saved earlier')
-    const matched = await Hooks.sql`
+    const sql = await Hooks.getSQLConnection()
+    const matched = await sql`
       select decrypted_raw_key = '${Hooks.sql.types.bytea(rawKey)}'
       from pgsodium.decrypted_key
       where name = 'test_key'
