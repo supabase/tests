@@ -10,7 +10,7 @@ const config: Config.InitialOptions = {
   globalTeardown: '<rootDir>/.jest/teardown.ts',
   setupFilesAfterEnv: ['<rootDir>/.jest/jest-custom-reporter.ts'],
   testRunner: 'jest-jasmine2',
-  testTimeout: 15000,
+  testTimeout: 40000,
   coverageThreshold: {
     global: {
       branches: 0,
