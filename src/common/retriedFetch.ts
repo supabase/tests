@@ -10,7 +10,7 @@ export default async function retriedFetch(
   for (let i = 0; i < retries - 1; i++) {
     try {
       const res = await timeoutFetch(input, init, timeout)
-      if (res.status >= 100 && res.status < 500) {
+      if (res.status >= 100 && res.status < 400) {
         return res
       }
       console.log(`Retrying fetch ${i}`, res.status, res.statusText)
