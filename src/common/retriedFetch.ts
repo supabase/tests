@@ -3,7 +3,7 @@ import timeoutFetch from './timeoutFetch'
 export default async function retriedFetch(
   input: RequestInfo,
   init?: RequestInit,
-  timeout: number = 5000,
+  timeout: number = 10000,
   retries: number = 3,
   delayBase: number = 200
 ): Promise<Response> {
