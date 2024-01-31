@@ -1,7 +1,6 @@
 export default async function timeoutRequest<T>(
   request: Promise<T>,
-  timeout: number,
-  abort?: AbortController
+  timeout: number
 ): Promise<T> {
   let timer: NodeJS.Timeout
 
