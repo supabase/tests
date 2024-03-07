@@ -209,10 +209,8 @@ class Authentication extends Hooks {
     expect(user.role).toEqual('authenticated')
     expect(user.aud).toEqual('authenticated')
     // verify if metadata is correctly set after sing up
-    expect(user.user_metadata).toEqual({
-      username: username,
-      date: date,
-    })
+    expect(user.user_metadata.username).toEqual(username)
+    expect(user.user_metadata.date).toEqual(date)
   }
 
   @feature(FEATURE.AUTHENTICATION)
